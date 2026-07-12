@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=750, initial-scale=1.0">
+<title>段位卡片</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700;900&display=swap');
+
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #0a0a0a;
+    font-family: 'Noto Sans SC', 'Microsoft YaHei', sans-serif;
+  }
+
+  .card {
+    width: 750px;
+    height: 400px;
+    background:
+      /* 金属纹理叠加层 */
+      repeating-linear-gradient(
+        60deg,
+        transparent,
+        transparent 35px,
+        rgba(205, 127, 50, 0.03) 35px,
+        rgba(205, 127, 50, 0.03) 36px
+      ),
+      repeating-linear-gradient(
+        -60deg,
+        transparent,
+        transparent 35px,
+        rgba(205, 127, 50, 0.025) 35px,
+        rgba(205, 127, 50, 0.025) 36px
+      ),
+      linear-gradient(135deg, #1a0f0a, #2d1810, #1a0f0a);
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(205, 127, 50, 0.3);
+    box-shadow:
+      0 0 30px rgba(205, 127, 50, 0.3),
+      inset 0 0 80px rgba(205, 127, 50, 0.05);
+  }
+
+  /* 背景光晕效果 */
+  .card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+      ellipse at 30% 40%,
+      rgba(205, 127, 50, 0.12) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse at 70% 60%,
+      rgba(205, 127, 50, 0.08) 0%,
+      transparent 50%
+    );
+    pointer-events: none;
+  }
+
+  /* 暗纹装饰 + 金属拉丝 */
+  .card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(205, 127, 50, 0.02) 2px,
+        rgba(205, 127, 50, 0.02) 4px
+      );
+    pointer-events: none;
+  }
+
+  .content {
+    position: relative;
+    z-index: 2;
+    padding: 30px 35px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  /* ===== 顶部区域：头像 + 信息 ===== */
+  .top-section {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+  }
+
+  .avatar-wrapper {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  /* 外发光光环 */
+  .avatar-wrapper::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(205, 127, 50, 0.3) 0%, transparent 60%);
+    box-shadow: 0 0 20px rgba(205, 127, 50, 0.4);
+    pointer-events: none;
+  }
+
+  /* 高光弧线 */
+  .avatar-wrapper::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    width: 108px;
+    height: 108px;
+    border-radius: 50%;
+    background: conic-gradient(
+      from 210deg at 50% 50%,
+      transparent 0deg,
+      rgba(255, 215, 0, 0.25) 30deg,
+      transparent 60deg,
+      transparent 300deg,
+      rgba(255, 215, 0, 0.25) 330deg,
+      transparent 360deg
+    );
+    pointer-events: none;
+    z-index: 3;
+  }
+
+  .avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid #CD7F32;
+    box-shadow:
+      0 0 20px rgba(205, 127, 50, 0.5),
+      inset 0 0 15px rgba(205, 127, 50, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #2d1810, #1a0f0a);
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
+  }
+
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .avatar-placeholder {
+    color: #CD7F32;
+    font-size: 38px;
+    font-weight: 900;
+    text-shadow: 0 0 10px rgba(205, 127, 50, 0.3);
+  }
+
+  .player-info {
+    flex: 1;
+  }
+
+  .player-name {
+    font-size: 32px;
+    font-weight: 900;
+    color: #FFD700;
+    text-shadow:
+      0 0 10px rgba(255, 215, 0, 0.3),
+      0 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+  }
+
+  .tier-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #CD7F32;
+    text-shadow: 0 0 8px rgba(205, 127, 50, 0.2);
+    margin-bottom: 6px;
+  }
+
+  .star-display {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .star {
+    font-size: 26px;
+    line-height: 1;
+  }
+  .star.active {
+    color: #FFD700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  }
+  .star.inactive {
+    color: #8B6914;
+    text-shadow: 0 0 4px rgba(205, 127, 50, 0.3);
+  }
+
+  /* ===== 分隔线 ===== */
+  .divider {
+    height: 1px;
+    margin: 10px 0 8px 0;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(205, 127, 50, 0.5) 20%,
+      rgba(205, 127, 50, 0.6) 50%,
+      rgba(205, 127, 50, 0.5) 80%,
+      transparent
+    );
+    box-shadow: 0 0 6px rgba(205, 127, 50, 0.2);
+  }
+
+  /* ===== 中间：积分面板 ===== */
+  .points-section {
+    display: flex;
+    gap: 0;
+    padding: 6px 0;
+  }
+
+  .points-item {
+    flex: 1;
+    position: relative;
+    padding: 0 20px;
+  }
+
+  /* 中间竖线分隔 */
+  .points-item:first-child {
+    border-right: 1px solid rgba(205, 127, 50, 0.45);
+    box-shadow: 1px 0 6px rgba(205, 127, 50, 0.15);
+  }
+
+  .points-label {
+    font-size: 15px;
+    color: #D4A856;
+    margin-bottom: 4px;
+    letter-spacing: 1px;
+  }
+
+  .points-value {
+    font-size: 36px;
+    font-weight: 900;
+    color: #FFD700;
+    text-shadow: 0 0 12px rgba(255, 215, 0, 0.3);
+    line-height: 1.2;
+  }
+
+  .points-sub {
+    font-size: 13px;
+    color: #D4A856;
+    margin-top: 2px;
+  }
+
+  .points-sub span {
+    color: #CD7F32;
+  }
+
+  /* ===== 底部：进度 ===== */
+  .bottom-section {
+    padding-top: 4px;
+  }
+
+  .next-tier-label {
+    font-size: 14px;
+    color: #E0B070;
+    margin-bottom: 8px;
+  }
+
+  .next-tier-label span {
+    color: #CD7F32;
+    font-weight: 700;
+  }
+
+  .progress-bar-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .progress-track {
+    flex: 1;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 9px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 9px;
+    background: linear-gradient(90deg, #CD7F32, #B8860B);
+    box-shadow:
+      0 0 12px rgba(205, 127, 50, 0.6),
+      inset 0 0 6px rgba(255, 215, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transition: width 0.5s ease;
+    position: relative;
+  }
+
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.2) 0%,
+      transparent 100%
+    );
+    border-radius: 9px 9px 0 0;
+  }
+
+  .progress-text {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    font-weight: 700;
+    color: #FFFFFF;
+    text-shadow: 0 0 6px rgba(0,0,0,0.8), 0 1px 2px rgba(0,0,0,0.9);
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  /* 底部银行标签 */
+  .bank-footer {
+    text-align: center;
+    font-size: 11px;
+    color: rgba(205, 127, 50, 0.4);
+    letter-spacing: 2px;
+    margin-top: 4px;
+  }
+
+  /* ===== 装饰性角落元素 ===== */
+  .corner-deco {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.15;
+  }
+  .corner-deco.tl {
+    top: 0;
+    left: 0;
+    width: 60px;
+    height: 60px;
+    border-top: 2px solid #CD7F32;
+    border-left: 2px solid #CD7F32;
+  }
+  .corner-deco.tr {
+    top: 0;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    border-top: 2px solid #CD7F32;
+    border-right: 2px solid #CD7F32;
+  }
+  .corner-deco.bl {
+    bottom: 0;
+    right: 0;
+    width: 60px;
+    height: 60px;
+    border-bottom: 2px solid #CD7F32;
+    border-right: 2px solid #CD7F32;
+  }
+  .corner-deco.br {
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 60px;
+    border-bottom: 2px solid #CD7F32;
+    border-left: 2px solid #CD7F32;
+  }
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <!-- 角落装饰 -->
+  <div class="corner-deco tl"></div>
+  <div class="corner-deco tr"></div>
+  <div class="corner-deco bl"></div>
+  <div class="corner-deco br"></div>
+
+  <div class="content">
+    <!-- 顶部：头像 + 玩家信息 -->
+    <div class="top-section">
+      <div class="avatar-wrapper">
+        <div class="avatar" id="avatarContainer">
+          <span class="avatar-placeholder" id="avatarPlaceholder">明哲</span>
+          <img id="avatarImage" style="display:none" alt="头像" />
+        </div>
+      </div>
+      <div class="player-info">
+        <div class="player-name" id="playerName">陈明哲</div>
+        <div class="tier-name" id="tierName">🥉 倔强青铜Ⅲ</div>
+        <div class="star-display" id="starDisplay"></div>
+      </div>
+    </div>
+
+    <!-- 分隔线 -->
+    <div class="divider"></div>
+
+    <!-- 中间：积分面板 -->
+    <div class="points-section">
+      <div class="points-item">
+        <div class="points-label">成长 积分</div>
+        <div class="points-value" id="growthPoints">100</div>
+        <div class="points-sub">≈ <span id="growthMoney">10</span> 元</div>
+      </div>
+      <div class="points-item">
+        <div class="points-label">零花 积分</div>
+        <div class="points-value" id="pocketPoints">100</div>
+      </div>
+    </div>
+
+    <!-- 分隔线 -->
+    <div class="divider"></div>
+
+    <!-- 底部：进度 -->
+    <div class="bottom-section">
+      <div class="next-tier-label">
+        下一级 <span id="nextTierName">🥉青铜Ⅲ⭐</span> 还需 <span id="pointsToNext">200</span> 分
+      </div>
+      <div class="progress-bar-wrapper">
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill" style="width:33%">
+            <div class="progress-text" id="progressText">33%</div>
+          </div>
+        </div>
+      </div>
+      <div class="bank-footer">🏦 明哲成长银行 · 2026</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const cardData = {
+    name: "陈明哲",
+    avatar: null,
+    tierName: "🥉 倔强青铜Ⅲ",
+    tierShort: "青铜",
+    tierColor: "#CD7F32",
+    stars: 0,
+    maxStars: 3,
+    growthPoints: 100,
+    pocketPoints: 100,
+    nextTierName: "🥉青铜Ⅲ⭐",
+    pointsToNext: 200,
+    progress: 33,
+    growthMoney: 10
+  };
+
+  function renderCard(data) {
+    // 名字
+    document.getElementById('playerName').textContent = data.name;
+
+    // 段位名
+    document.getElementById('tierName').textContent = data.tierName;
+
+    // 头像
+    if (data.avatar) {
+      document.getElementById('avatarImage').src = data.avatar;
+      document.getElementById('avatarImage').style.display = 'block';
+      document.getElementById('avatarPlaceholder').style.display = 'none';
+    } else {
+      document.getElementById('avatarImage').style.display = 'none';
+      document.getElementById('avatarPlaceholder').style.display = 'block';
+    }
+
+    // 星星
+    renderStars(data.stars, data.maxStars);
+
+    // 积分
+    document.getElementById('growthPoints').textContent = data.growthPoints;
+    document.getElementById('pocketPoints').textContent = data.pocketPoints;
+    if (data.growthMoney !== undefined) {
+      document.getElementById('growthMoney').textContent = data.growthMoney;
+    } else {
+      document.getElementById('growthMoney').textContent = Math.round(data.growthPoints / 10);
+    }
+
+    // 底部进度
+    document.getElementById('nextTierName').textContent = data.nextTierName;
+    document.getElementById('pointsToNext').textContent = data.pointsToNext;
+    document.getElementById('progressFill').style.width = data.progress + '%';
+    document.getElementById('progressText').textContent = data.progress + '%';
+
+    // 卡片边框色
+    document.getElementById('card').style.borderColor = data.tierColor.replace(')', ',0.3)');
+  }
+
+  function renderStars(active, max) {
+    const container = document.getElementById('starDisplay');
+    container.innerHTML = '';
+    for (let i = 0; i < max; i++) {
+      const star = document.createElement('span');
+      star.className = 'star ' + (i < active ? 'active' : 'inactive');
+      star.textContent = i < active ? '⭐' : '☆';
+      container.appendChild(star);
+    }
+  }
+
+  // 渲染
+  renderCard(cardData);
+</script>
+</body>
+</html>
