@@ -653,10 +653,37 @@ function load() {
     if (raw) {
       S = JSON.parse(raw);
       if (S && S.version !== 3) migrateV3();
+      compensateBoxes();
       return;
     }
   } catch (e) { }
   S = seed(); save();
+  compensateBoxes();
+}
+/* 一次性补发：旧账本积累的积分没领过升级盲盒，按 V3 门槛表把当前积分重走一遍补齐 */
+function compensateBoxes() {
+  if (!S || !S.child || S.child.boxCompensated) return;
+  var pts = S.child.points;
+  var ups = 0, grands = 0;
+  for (var i = 1; i < S.config.tiers.length; i++) {
+    if (pts >= S.config.tiers[i].threshold) {
+      ups++;
+      if (S.config.tiers[i].short !== S.config.tiers[i - 1].short) grands++;
+    }
+  }
+  var k = S.config.king;
+  if (pts >= k.entry) {
+    var stars = Math.floor((pts - k.entry) / k.perStar);
+    ups += stars;
+    if (stars >= k.legendStar) grands++;
+    if (stars >= k.gloryStar) grands++;
+  }
+  var g, n;
+  for (g = 0; g < grands; g++) grantBox('grand');
+  for (n = 0; n < ups - grands; n++) grantBox('normal');
+  S.child.boxCompensated = true;
+  if (ups > 0) toast('🎁 补发历史升级盲盒 ×' + ups + '（含高级盒×' + grands + '），去背包开！');
+  save();
 }
 function migrateV3() {
   /* v1/v2 → v3：换王者段位制与 14 任务；积分/流水/开盒/兑换保留；
