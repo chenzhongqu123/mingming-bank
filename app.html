@@ -44,6 +44,14 @@ body {
   border-radius:8px; padding:2px 8px; font-family:inherit; cursor:pointer; }
 .parent-btn.on { color:#2a1503; background:linear-gradient(145deg,#FFD700,#CD7F32); border:none; font-weight:700; }
 
+/* buff 条 + 备份提醒条 */
+.strip { display:flex; align-items:center; gap:8px; padding:8px 14px; font-size:12px; font-weight:700;
+  border-bottom:1px solid var(--line); }
+#buffStrip { display:none; background:rgba(126,224,138,.08); border-bottom-color:rgba(126,224,138,.3); color:var(--green); }
+#buffStrip.on { display:flex; }
+#backupStrip { display:none; background:rgba(255,215,0,.07); border-bottom-color:rgba(255,215,0,.3); color:var(--gold-soft); cursor:pointer; }
+#backupStrip.on { display:flex; }
+
 /* ===== 家长横幅 ===== */
 #parentBar { display:none; flex-wrap:wrap; gap:6px; padding:10px 14px; background:rgba(255,215,0,.06);
   border-bottom:1px solid rgba(255,215,0,.25); }
@@ -64,15 +72,19 @@ main { flex:1; padding:14px 14px 20px; }
 .card-title { display:flex; align-items:center; gap:6px; font-size:14px; font-weight:700; color:var(--gold-soft); margin-bottom:12px; }
 .card-title .sub { margin-left:auto; font-size:11px; font-weight:400; color:var(--dim); }
 
+/* ===== 周曲线 ===== */
+#weekChart { width:100%; height:150px; display:block; }
+
 /* ===== 任务列表 ===== */
+.grp-title { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:900; color:var(--gold-soft); margin:8px 2px 8px; }
+.grp-title:first-child { margin-top:0; }
+.grp-tag { font-size:10px; font-weight:700; color:#2a1503; background:linear-gradient(145deg,#FFD700,#CD7F32); padding:2px 8px; border-radius:999px; }
 .task-row { display:flex; align-items:center; gap:12px; padding:13px 14px; margin-bottom:10px; border-radius:12px;
   background:var(--panel2); border:1px solid rgba(205,127,50,.18); }
-.task-row.off { opacity:.4; }
-.grp-title { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:900; color:var(--gold-soft); margin:8px 2px 8px; }
-.grp-tag { font-size:10px; font-weight:700; color:#2a1503; background:linear-gradient(145deg,#FFD700,#CD7F32); padding:2px 8px; border-radius:999px; }
 .task-ico { font-size:26px; width:34px; text-align:center; flex:none; }
 .task-info { flex:1; min-width:0; }
 .task-info .n { font-size:15px; font-weight:700; }
+.task-info .n .cnt { font-size:11px; color:var(--gold); margin-left:6px; }
 .task-info .p { font-size:12px; color:var(--dim); margin-top:3px; }
 .task-info .p b { color:var(--gold-soft); }
 .ck-btn { flex:none; min-height:44px; padding:0 16px; border:none; border-radius:12px; font-family:inherit;
@@ -125,6 +137,7 @@ main { flex:1; padding:14px 14px 20px; }
 .tier-cell.now { border-color:var(--gold); box-shadow:0 0 12px rgba(255,215,0,.2); }
 .tier-cell.now .tp { color:var(--gold); }
 .tier-cell.past { opacity:.45; }
+.tier-cell.king { grid-column:1 / -1; border-color:rgba(255,111,0,.5); }
 .hist-item { padding:10px 0; border-bottom:1px dashed rgba(205,127,50,.18); }
 .hist-item:last-child { border-bottom:none; }
 .hist-item .l1 { font-size:13px; font-weight:700; }
@@ -132,15 +145,23 @@ main { flex:1; padding:14px 14px 20px; }
   background:linear-gradient(145deg,#FFD700,#CD7F32); }
 .hist-item .l2 { font-size:11px; color:var(--dim); margin-top:3px; }
 
-/* ===== 背包 ===== */
+/* ===== 背包/道具 ===== */
 .box-row { display:flex; align-items:center; gap:12px; padding:14px; margin-bottom:10px; border-radius:12px;
   background:var(--panel2); border:1px solid rgba(205,127,50,.25); }
 .box-ico { font-size:32px; flex:none; }
 .box-info { flex:1; min-width:0; }
 .box-info .n { font-size:15px; font-weight:700; }
 .box-info .m { font-size:11px; color:var(--dim); margin-top:3px; }
+.item-row { display:flex; align-items:center; gap:12px; padding:14px; margin-bottom:10px; border-radius:12px;
+  background:var(--panel2); border:1px solid rgba(126,224,138,.25); }
+.item-row .n { font-size:15px; font-weight:700; }
+.item-row .m { font-size:11px; color:var(--dim); margin-top:3px; }
+.item-row .cnt { color:var(--gold); font-weight:900; }
 .empty { padding:18px 10px; text-align:center; font-size:13px; color:var(--dim);
   border:1px dashed rgba(205,127,50,.25); border-radius:12px; line-height:1.7; }
+.prob-tbl { width:100%; font-size:11px; color:var(--dim); border-collapse:collapse; margin-top:4px; }
+.prob-tbl td { padding:3px 4px; border-bottom:1px dashed rgba(205,127,50,.15); }
+.prob-tbl td:last-child { text-align:right; color:var(--gold-soft); }
 .tx-item { border-radius:12px; padding:12px 14px; margin-bottom:10px; background:var(--panel2); border:1px solid rgba(205,127,50,.18); }
 .tx-top { display:flex; align-items:center; gap:8px; margin-bottom:4px; }
 .tx-date { font-size:12px; color:var(--dim); }
@@ -152,13 +173,13 @@ main { flex:1; padding:14px 14px 20px; }
 .tx-amt.neg { color:var(--red); }
 .tx-desc { font-size:12px; color:var(--dim); line-height:1.6; word-break:break-all; }
 
-/* ===== 我的/里程碑/成就 ===== */
+/* ===== 我的/里程碑/成就/称号 ===== */
 .me-head { display:flex; align-items:center; gap:14px; }
 .ms-card { padding:14px; margin-bottom:10px; border-radius:12px; background:var(--panel2);
-  border:1px solid rgba(205,127,50,.18); position:relative; }
+  border:1px solid rgba(205,127,50,.18); }
 .ms-card.reach { border-color:rgba(255,215,0,.5); box-shadow:0 0 14px rgba(255,215,0,.12); }
 .ms-card.done { opacity:.55; }
-.ms-top { display:flex; align-items:center; gap:8px; }
+.ms-top { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .ms-tier { font-size:11px; font-weight:700; color:#2a1503; background:linear-gradient(145deg,#FFD700,#CD7F32);
   padding:2px 8px; border-radius:6px; }
 .ms-name { font-size:15px; font-weight:700; }
@@ -166,13 +187,23 @@ main { flex:1; padding:14px 14px 20px; }
 .ms-card.reach .ms-st { color:var(--gold); font-weight:700; }
 .ms-desc { font-size:12px; color:var(--dim); margin-top:6px; line-height:1.6; }
 .achv-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
-.achv { text-align:center; padding:14px 6px 12px; border-radius:12px; background:var(--panel2); border:1px solid rgba(205,127,50,.18); }
+.achv { text-align:center; padding:14px 6px 12px; border-radius:12px; background:var(--panel2); border:1px solid rgba(205,127,50,.18); position:relative; }
 .achv .ico { font-size:28px; }
 .achv .nm { font-size:12px; margin-top:6px; }
 .achv .st { font-size:10px; margin-top:4px; color:var(--dim); }
 .achv.got { border-color:rgba(255,215,0,.5); box-shadow:0 0 14px rgba(255,215,0,.12); }
 .achv.got .st { color:var(--gold); font-weight:700; }
 .achv:not(.got) .ico { filter:grayscale(1); opacity:.4; }
+.achv .topmark { position:absolute; top:6px; right:8px; font-size:10px; }
+.title-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+.title-cell { text-align:center; padding:12px 6px; border-radius:12px; background:var(--panel2);
+  border:1px solid rgba(205,127,50,.18); cursor:pointer; }
+.title-cell.own { border-color:rgba(255,215,0,.45); }
+.title-cell.eq { border-color:var(--gold); box-shadow:0 0 12px rgba(255,215,0,.25); }
+.title-cell .tn { font-size:14px; font-weight:900; color:var(--gold-soft); }
+.title-cell.own .tn { color:var(--gold); }
+.title-cell .th { font-size:10px; color:var(--dim); margin-top:4px; line-height:1.5; }
+.title-cell.eq .th { color:var(--gold); font-weight:700; }
 
 /* ===== 底部导航 ===== */
 .tabbar { position:fixed; left:0; right:0; bottom:0; z-index:30; display:flex; justify-content:center; gap:6px;
@@ -207,7 +238,6 @@ main { flex:1; padding:14px 14px 20px; }
 .f-2col { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .big-btn { width:100%; min-height:48px; border:none; border-radius:12px; font-family:inherit; font-size:15px; font-weight:900;
   color:#2a1503; background:linear-gradient(145deg,#FFD700,#CD7F32); box-shadow:0 3px 10px rgba(205,127,50,.35); cursor:pointer; margin-top:6px; }
-.big-btn:disabled { opacity:.4; }
 .ghost-btn { width:100%; min-height:44px; border-radius:12px; font-family:inherit; font-size:14px; font-weight:700;
   color:var(--gold-soft); background:rgba(205,127,50,.14); border:1px solid rgba(205,127,50,.5); cursor:pointer; margin-top:8px; }
 .danger-btn { width:100%; min-height:44px; border-radius:12px; font-family:inherit; font-size:13px; color:var(--red);
@@ -225,6 +255,7 @@ textarea.f-input { min-height:90px; resize:vertical; }
 .cfg-name .s { display:block; font-size:11px; color:var(--dim); font-weight:400; margin-top:2px; }
 .cfg-num { width:86px; min-height:40px; text-align:center; border-radius:10px; border:1px solid rgba(205,127,50,.4);
   background:rgba(10,5,2,.5); color:var(--gold); font-family:inherit; font-size:15px; font-weight:700; }
+.cfg-num.sm { width:62px; }
 .cfg-tog { width:52px; height:30px; border-radius:999px; border:1px solid rgba(205,127,50,.5); background:rgba(10,5,2,.5);
   position:relative; cursor:pointer; flex:none; }
 .cfg-tog::after { content:''; position:absolute; top:3px; left:3px; width:22px; height:22px; border-radius:50%;
@@ -233,21 +264,40 @@ textarea.f-input { min-height:90px; resize:vertical; }
 .cfg-tog.on::after { left:25px; background:var(--gold); }
 .tiergrp { margin-bottom:12px; }
 .tiergrp .g-name { font-size:13px; font-weight:900; color:var(--gold-soft); margin-bottom:6px; }
-.tiergrp .g-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px; }
-.tiergrp .g-cell { background:var(--panel2); border:1px solid rgba(205,127,50,.18); border-radius:10px; padding:8px; }
+.tiergrp .g-row { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; }
+.tiergrp .g-cell { background:var(--panel2); border:1px solid rgba(205,127,50,.18); border-radius:10px; padding:8px 4px; }
 .tiergrp .g-cell .cn { font-size:11px; color:var(--dim); text-align:center; }
-.tiergrp .g-cell input { width:100%; margin-top:4px; text-align:center; min-height:36px; border-radius:8px;
-  border:1px solid rgba(205,127,50,.4); background:rgba(10,5,2,.5); color:var(--gold); font-family:inherit; font-size:14px; font-weight:700; }
+.tiergrp .g-cell input { width:100%; margin-top:4px; text-align:center; min-height:34px; border-radius:8px;
+  border:1px solid rgba(205,127,50,.4); background:rgba(10,5,2,.5); color:var(--gold); font-family:inherit; font-size:13px; font-weight:700; }
 
 /* 开盒动画 */
 .box-anim { text-align:center; padding:20px 0; }
 .box-anim .big { font-size:80px; display:inline-block; animation:shake .5s ease infinite; }
 @keyframes shake { 0%,100%{transform:rotate(-8deg) scale(1);} 50%{transform:rotate(8deg) scale(1.12);} }
 .box-anim .txt { font-size:15px; color:var(--gold-soft); margin:14px 0 4px; font-weight:700; }
-.box-anim .res { font-size:44px; font-weight:900; color:var(--gold); margin:8px 0; text-shadow:0 0 20px rgba(255,215,0,.5); }
+.box-anim .res { font-size:40px; font-weight:900; color:var(--gold); margin:8px 0; text-shadow:0 0 20px rgba(255,215,0,.5); }
+.box-anim .res.card { font-size:26px; }
+
+/* ===== 升段庆祝 + 彩带 ===== */
+#celebrate { display:none; position:fixed; inset:0; z-index:80; background:rgba(5,2,0,.92);
+  align-items:center; justify-content:center; flex-direction:column; text-align:center; cursor:pointer; }
+#celebrate.on { display:flex; animation:celebIn .4s ease; }
+@keyframes celebIn { from{opacity:0;} to{opacity:1;} }
+#celebrate .c-emoji { font-size:96px; animation:popIn .6s cubic-bezier(.2,1.6,.4,1); }
+#celebrate.grand .c-emoji { animation:popIn .6s cubic-bezier(.2,1.6,.4,1), spinGlow 1.2s ease; }
+@keyframes popIn { from{transform:scale(0);} to{transform:scale(1);} }
+@keyframes spinGlow { 0%{filter:drop-shadow(0 0 10px #FFD700);} 50%{filter:drop-shadow(0 0 40px #FFD700);} 100%{filter:drop-shadow(0 0 14px #FFD700);} }
+#celebrate .c-title { font-size:30px; font-weight:900; color:var(--gold); margin-top:14px; text-shadow:0 0 24px rgba(255,215,0,.6); }
+#celebrate .c-sub { font-size:14px; color:var(--gold-soft); margin-top:10px; line-height:1.8; }
+#celebrate .c-tap { position:absolute; bottom:calc(30px + env(safe-area-inset-bottom)); font-size:12px; color:var(--dim); }
+#celebrate .c-star { position:absolute; font-size:22px; animation:floatUp 1.6s ease forwards; }
+@keyframes floatUp { from{opacity:1; transform:translateY(0) rotate(0);} to{opacity:0; transform:translateY(-120px) rotate(40deg);} }
+.confetti { position:fixed; top:-20px; z-index:90; width:10px; height:14px; border-radius:2px;
+  animation:fall linear forwards; pointer-events:none; }
+@keyframes fall { to { transform:translateY(110vh) rotate(720deg); opacity:.6; } }
 .toast { position:fixed; left:50%; bottom:calc(96px + env(safe-area-inset-bottom)); transform:translateX(-50%);
   background:rgba(22,12,7,.95); border:1px solid var(--gold); color:var(--gold-soft); font-size:13px; font-weight:700;
-  padding:10px 18px; border-radius:999px; z-index:60; opacity:0; transition:opacity .25s; pointer-events:none; max-width:88vw; text-align:center; }
+  padding:10px 18px; border-radius:999px; z-index:95; opacity:0; transition:opacity .25s; pointer-events:none; max-width:88vw; text-align:center; }
 .toast.on { opacity:1; }
 .small-note { font-size:11px; color:var(--dim); text-align:center; line-height:1.7; margin-top:8px; }
 </style>
@@ -270,6 +320,9 @@ textarea.f-input { min-height:90px; resize:vertical; }
     </div>
   </header>
 
+  <div class="strip" id="buffStrip">⚡ 双倍积分进行中 · <span id="buffLeft"></span></div>
+  <div class="strip" id="backupStrip">🗄️ 超过 7 天没导出备份了，点此去导出一份（防丢账本）</div>
+
   <div id="parentBar">
     <button class="hot" id="pbConfirm">待确认<span class="badge" id="pbBadge">0</span></button>
     <button id="pbRedeem">兑换记账</button>
@@ -284,6 +337,10 @@ textarea.f-input { min-height:90px; resize:vertical; }
       <div class="card" id="pendCard" style="display:none">
         <div class="card-title">⏳ 待家长确认<span class="sub">确认后按段位加成到账</span></div>
         <div id="pendList"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">📈 本周成长曲线<span class="sub">每日积分收入</span></div>
+        <canvas id="weekChart"></canvas>
       </div>
       <div class="card">
         <div class="card-title">✅ 今日任务<span class="sub" id="homeProgress"></span></div>
@@ -306,15 +363,15 @@ textarea.f-input { min-height:90px; resize:vertical; }
         <div class="statline">
           <span class="chip">成长积分 <b id="tierPoints">0</b></span>
           <span class="chip">任务加成 <b id="tierBonus">×1.00</b></span>
-          <span class="chip" id="tierStreakChip">连续全勤 <b id="tierStreak">0</b> 天</span>
+          <span class="chip">连续全勤 <b id="tierStreak">0</b> 天</span>
         </div>
         <div class="bar-wrap">
-          <div class="bar-label"><span>升档进度</span><b id="tierNext"></b></div>
+          <div class="bar-label"><span id="tierBarLabel">升档进度</span><b id="tierNext"></b></div>
           <div class="bar"><i id="tierBar" style="width:0%"></i></div>
         </div>
       </div>
       <div class="card">
-        <div class="card-title">🗺️ 段位总览<span class="sub">青铜 → 王者</span></div>
+        <div class="card-title">🗺️ 段位总览<span class="sub">倔强青铜 → 最强王者</span></div>
         <div class="tier-map" id="tierMap"></div>
       </div>
       <div class="card">
@@ -325,8 +382,13 @@ textarea.f-input { min-height:90px; resize:vertical; }
 
     <section id="tab-bag" class="tab">
       <div class="card">
-        <div class="card-title">🎁 未开盲盒<span class="sub">升级自动获得</span></div>
+        <div class="card-title">🎒 我的道具<span class="sub">双倍卡自己激活 · 券要家长确认</span></div>
+        <div id="itemList"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎁 未开盲盒<span class="sub" id="pityNote"></span></div>
         <div id="boxList"></div>
+        <div class="small-note" id="probNote"></div>
       </div>
       <div class="card">
         <div class="card-title">🎊 开盒记录</div>
@@ -343,11 +405,15 @@ textarea.f-input { min-height:90px; resize:vertical; }
         </div>
       </div>
       <div class="card">
+        <div class="card-title">👑 称号<span class="sub">点击佩戴</span></div>
+        <div class="title-grid" id="titleGrid"></div>
+      </div>
+      <div class="card">
         <div class="card-title">🌟 里程碑愿望<span class="sub">升段解锁现实奖励</span></div>
         <div id="msList"></div>
       </div>
       <div class="card">
-        <div class="card-title">🏆 成就墙</div>
+        <div class="card-title">🏆 成就墙<span class="sub" id="achvCount"></span></div>
         <div class="achv-grid" id="achvGrid"></div>
       </div>
       <div class="small-note" id="dataNote"></div>
@@ -365,32 +431,18 @@ textarea.f-input { min-height:90px; resize:vertical; }
 </div>
 
 <div id="mask"><div class="sheet" id="sheet"></div></div>
+<div id="celebrate"></div>
 <div class="toast" id="toast"></div>
 
 <script>
-/* ================= 配置与种子 ================= */
+/* ================= 常量与种子 ================= */
 var STORE_KEY = 'czq_hero_v1';
 
 var TIER_GROUPS = ['青铜','白银','黄金','铂金','钻石','星耀','王者'];
+var TIER_FULL = { '青铜':'倔强青铜','白银':'秩序白银','黄金':'荣耀黄金','铂金':'尊贵铂金','钻石':'永恒钻石','星耀':'至尊星耀','王者':'最强王者' };
+var TIER_EMOJI = { '青铜':'🥉','白银':'🥈','黄金':'🥇','铂金':'💠','钻石':'💎','星耀':'✨','王者':'👑' };
 var TIER_COLOR = { '青铜':'#CD7F32','白银':'#C0C0C0','黄金':'#FFD700','铂金':'#00CED1','钻石':'#4FC3F7','星耀':'#AB47BC','王者':'#FF6F00' };
-var TIER_TITLE = { '青铜':'青铜小勇士','白银':'白银小先锋','黄金':'黄金小达人','铂金':'铂金小战神','钻石':'钻石小传奇','星耀':'星耀之星','王者':'荣耀小王者' };
-var STARS_PER = 3;
-
-function defaultTiers() {
-  var def = [
-    ['青铜', 0, 67, 134, 1.00], ['白银', 200, 300, 400, 1.05], ['黄金', 500, 667, 834, 1.10],
-    ['铂金', 1000, 1333, 1667, 1.20], ['钻石', 2000, 2500, 3000, 1.30],
-    ['星耀', 3500, 4000, 4500, 1.40], ['王者', 5000, 6000, 7000, 1.50]
-  ];
-  var arr = [];
-  def.forEach(function (g) {
-    for (var s = 1; s <= STARS_PER; s++) {
-      arr.push({ name: g[0] + ['一','二','三'][s-1] + '星', short: g[0], stars: s,
-                 threshold: g[s], bonus: g[4] });
-    }
-  });
-  return arr;
-}
+var TIER_TITLE = { '青铜':'青铜小勇士','白银':'白银小先锋','黄金':'黄金小达人','铂金':'铂金小战神','钻石':'钻石小传奇','星耀':'星耀之星','王者':'峡谷小王者' };
 
 var TASK_GROUPS = [
   { key:'basic', label:'基础任务', tag:'全勤四项' },
@@ -398,35 +450,154 @@ var TASK_GROUPS = [
   { key:'sport', label:'运动类' },
   { key:'chore', label:'家务类' }
 ];
+
+/* 王者荣耀段位结构：青铜/白银 3级×3星，黄金/铂金 4级×4星，钻石/星耀 5级×5星，王者按星无限 */
+function defaultTiers() {
+  var def = [
+    ['青铜', 3, 3, [0, 100, 200], 1.00],
+    ['白银', 3, 3, [350, 500, 650], 1.05],
+    ['黄金', 4, 4, [800, 950, 1100, 1250], 1.10],
+    ['铂金', 4, 4, [1450, 1650, 1850, 2050], 1.20],
+    ['钻石', 5, 5, [2300, 2550, 2800, 3050, 3300], 1.30],
+    ['星耀', 5, 5, [3650, 4000, 4350, 4700, 5050], 1.40]
+  ];
+  var roman = ['Ⅰ','Ⅱ','Ⅲ','Ⅳ','Ⅴ'];
+  var arr = [];
+  def.forEach(function (g) {
+    for (var i = 0; i < g[1]; i++) {
+      /* 门槛从低到高，段名从大到小：青铜Ⅲ(最低)→青铜Ⅱ→青铜Ⅰ(最高)，与王者荣耀一致 */
+      arr.push({ name: TIER_FULL[g[0]] + roman[g[1] - 1 - i], short: g[0], stars: g[2], threshold: g[3][i], bonus: g[4] });
+    }
+  });
+  return arr;
+}
+function defaultKing() { return { entry: 5500, perStar: 300, legendStar: 25, gloryStar: 50, bonus: 1.50 }; }
+
 function defaultTasks() {
   return [
-    { id:'t1',  name:'准时起床', icon:'🌅', points:5, group:'basic', enabled:true },
-    { id:'t2',  name:'刷牙', icon:'🪥', points:5, group:'basic', enabled:true },
-    { id:'t3',  name:'整理房间', icon:'🏠', points:5, group:'basic', enabled:true },
-    { id:'t4',  name:'准时完成作业', icon:'✍️', points:10, group:'basic', enabled:true },
-    { id:'t5',  name:'做一份练习试卷', icon:'📝', points:10, group:'study', enabled:true },
-    { id:'t6',  name:'练习试卷全对', icon:'💯', points:10, group:'study', enabled:true },
-    { id:'t7',  name:'学科小测试考100', icon:'🎯', points:20, group:'study', enabled:true },
-    { id:'t8',  name:'期中/期末考100', icon:'🥇', points:50, group:'study', enabled:true },
-    { id:'t9',  name:'完成力量训练', icon:'💪', points:20, group:'sport', enabled:true },
-    { id:'t10', name:'跑步3公里', icon:'🏃', points:20, group:'sport', enabled:true },
-    { id:'t11', name:'跑步5公里', icon:'🏅', points:50, group:'sport', enabled:true },
-    { id:'t12', name:'洗碗', icon:'🍽️', points:10, group:'chore', enabled:true },
-    { id:'t13', name:'扫地', icon:'🧹', points:5, group:'chore', enabled:true }
+    { id:'t1',  name:'准时起床', icon:'🌅', points:5, group:'basic', enabled:true, maxPerDay:1 },
+    { id:'t2',  name:'刷牙', icon:'🪥', points:5, group:'basic', enabled:true, maxPerDay:1 },
+    { id:'t3',  name:'整理房间', icon:'🏠', points:5, group:'basic', enabled:true, maxPerDay:1 },
+    { id:'t4',  name:'准时完成作业', icon:'✍️', points:10, group:'basic', enabled:true, maxPerDay:1 },
+    { id:'t5',  name:'做一份练习试卷', icon:'📝', points:10, group:'study', enabled:true, maxPerDay:1 },
+    { id:'t6',  name:'练习试卷全对', icon:'💯', points:10, group:'study', enabled:true, maxPerDay:1 },
+    { id:'t7',  name:'学科小测试考100', icon:'🎯', points:20, group:'study', enabled:true, maxPerDay:1 },
+    { id:'t8',  name:'期中/期末考100', icon:'🥇', points:50, group:'study', enabled:true, maxPerDay:1 },
+    { id:'t14', name:'阅读时间(半小时)', icon:'📖', points:5, group:'study', enabled:true, maxPerDay:4 },
+    { id:'t9',  name:'完成力量训练', icon:'💪', points:20, group:'sport', enabled:true, maxPerDay:1 },
+    { id:'t10', name:'跑步3公里', icon:'🏃', points:20, group:'sport', enabled:true, maxPerDay:1 },
+    { id:'t11', name:'跑步5公里', icon:'🏅', points:50, group:'sport', enabled:true, maxPerDay:1 },
+    { id:'t12', name:'洗碗', icon:'🍽️', points:10, group:'chore', enabled:true, maxPerDay:1 },
+    { id:'t13', name:'扫地', icon:'🧹', points:5, group:'chore', enabled:true, maxPerDay:1 }
   ];
 }
 
 function defaultMilestones() {
   return [
-    { id:'m1', tier:'黄金', name:'吃一顿大餐', desc:'升到黄金段位，吃一顿自己选的大餐（示例，可在后台改）', granted:false, grantedAt:null },
-    { id:'m2', tier:'铂金', name:'买一个乐高', desc:'升到铂金段位，买一个想要的乐高（示例，可在后台改）', granted:false, grantedAt:null },
-    { id:'m3', tier:'钻石', name:'周末游乐园', desc:'升到钻石段位，去游乐园玩一整天（示例，可在后台改）', granted:false, grantedAt:null }
+    { id:'m1', tier:'黄金', name:'吃一顿大餐', desc:'升到荣耀黄金段位，吃一顿自己选的大餐（示例，可在后台改）', granted:false, grantedAt:null },
+    { id:'m2', tier:'铂金', name:'买一个乐高', desc:'升到尊贵铂金段位，买一个想要的乐高（示例，可在后台改）', granted:false, grantedAt:null },
+    { id:'m3', tier:'钻石', name:'周末游乐园', desc:'升到永恒钻石段位，去游乐园玩一整天（示例，可在后台改）', granted:false, grantedAt:null }
   ];
+}
+
+/* 盲盒奖池：稀有度顺序=积分>天卡>周卡>游戏1h>游戏3h>自由日 */
+var BOX_POOLS = {
+  normal: [
+    { item:'points', w:70 }, { item:'dbDay', w:15 }, { item:'dbWeek', w:6 },
+    { item:'game1', w:6 }, { item:'game3', w:2 }, { item:'freeDay', w:1 }
+  ],
+  grand: [
+    { item:'points', w:45 }, { item:'dbDay', w:20 }, { item:'dbWeek', w:12 },
+    { item:'game1', w:12 }, { item:'game3', w:7 }, { item:'freeDay', w:4 }
+  ]
+};
+var ITEM_META = {
+  points: { name:'积分', icon:'💰' },
+  dbDay:  { name:'一天双倍积分卡', icon:'⚡' },
+  dbWeek: { name:'一周双倍积分卡', icon:'🌩️' },
+  game1:  { name:'游戏时间1小时', icon:'🎮' },
+  game3:  { name:'游戏时间3小时', icon:'🕹️' },
+  freeDay:{ name:'一天自由安排日', icon:'🌈' }
+};
+var RARE_ITEMS = ['game3', 'freeDay'];
+var BOX_KIND_META = {
+  normal:   { name:'普通盲盒', icon:'🎁', range:[20, 50] },
+  grand:    { name:'高级盲盒', icon:'🏆', range:[50, 200] },
+  memorial: { name:'纪念盲盒', icon:'🎗️', range:[50, 200] }
+};
+
+var TITLES = [
+  { id:'freeGod',  name:'自由之神', how:'开出一天自由安排日' },
+  { id:'timeLord', name:'时间领主', how:'开出游戏时间3小时' },
+  { id:'rateMaster', name:'倍率大师', how:'开出一周双倍积分卡' },
+  { id:'legendKing', name:'传奇王者', how:'最强王者 25★' },
+  { id:'gloryKing', name:'荣耀王者', how:'最强王者 50★' }
+];
+
+/* 成就定义：cond(s, h) 由数据判定；top=顶级成就发纪念盲盒 */
+var ACHIEVEMENTS = [
+  { id:'a1',  icon:'✅', name:'初次打卡', desc:'首次完成任务确认', top:false, cond:function(s){ return totalCheckins(s) >= 1; } },
+  { id:'a2',  icon:'🔥', name:'七日之约', desc:'连续全勤 7 天', top:false, cond:function(s,h){ return h.streakDays() >= 7; } },
+  { id:'a3',  icon:'🔥', name:'半月铁人', desc:'连续全勤 15 天', top:false, cond:function(s,h){ return h.streakDays() >= 15; } },
+  { id:'a4',  icon:'🏅', name:'全勤之星', desc:'连续全勤 30 天', top:false, cond:function(s,h){ return h.streakDays() >= 30; } },
+  { id:'a5',  icon:'👑', name:'百日传奇', desc:'连续全勤 100 天', top:true, cond:function(s,h){ return h.streakDays() >= 100; } },
+  { id:'a6',  icon:'📝', name:'笔耕不辍', desc:'累计完成练习试卷 30 份', top:false, cond:function(s){ return taskTxCount(s, '做一份练习试卷') >= 30; } },
+  { id:'a7',  icon:'💯', name:'百分百', desc:'练习试卷全对累计 10 次', top:false, cond:function(s){ return taskTxCount(s, '练习试卷全对') >= 10; } },
+  { id:'a8',  icon:'🎯', name:'小测之王', desc:'学科小测试 100 分累计 5 次', top:false, cond:function(s){ return taskTxCount(s, '学科小测试考100') >= 5; } },
+  { id:'a9',  icon:'🥇', name:'大考封神', desc:'期中/期末考 100 分累计 2 次', top:true, cond:function(s){ return taskTxCount(s, '期中/期末考100') >= 2; } },
+  { id:'a10', icon:'📖', name:'阅读新秀', desc:'累计阅读 10 小时', top:false, cond:function(s){ return readHours(s) >= 10; } },
+  { id:'a11', icon:'📚', name:'手不释卷', desc:'累计阅读 50 小时', top:false, cond:function(s){ return readHours(s) >= 50; } },
+  { id:'a12', icon:'📖', name:'博览群书', desc:'累计阅读 100 小时', top:false, cond:function(s){ return readHours(s) >= 100; } },
+  { id:'a13', icon:'🏃', name:'跑者初心', desc:'跑步累计 10 次', top:false, cond:function(s){ return taskTxCount(s, '跑步') >= 10; } },
+  { id:'a14', icon:'🏅', name:'长跑健将', desc:'跑步 5 公里累计 10 次', top:false, cond:function(s){ return taskTxCount(s, '跑步5公里') >= 10; } },
+  { id:'a15', icon:'💪', name:'力量觉醒', desc:'力量训练累计 30 次', top:false, cond:function(s){ return taskTxCount(s, '力量训练') >= 30; } },
+  { id:'a16', icon:'🧹', name:'家务小能手', desc:'洗碗/扫地累计 50 次', top:false, cond:function(s){ return taskTxCount(s, '洗碗') + taskTxCount(s, '扫地') >= 50; } },
+  { id:'a17', icon:'⚔️', name:'初入白银', desc:'首次升入秩序白银', top:false, cond:function(s,h){ return bestShortIdx(s, h) >= shortOrder('白银'); } },
+  { id:'a18', icon:'✨', name:'金光闪耀', desc:'首次升入荣耀黄金', top:false, cond:function(s,h){ return bestShortIdx(s, h) >= shortOrder('黄金'); } },
+  { id:'a19', icon:'💎', name:'钻石之光', desc:'首次升入永恒钻石', top:false, cond:function(s,h){ return bestShortIdx(s, h) >= shortOrder('钻石'); } },
+  { id:'a20', icon:'👑', name:'王者降临', desc:'首次升入最强王者', top:true, cond:function(s,h){ return bestShortIdx(s, h) >= shortOrder('王者'); } },
+  { id:'a21', icon:'🌟', name:'传奇加冕', desc:'最强王者 25 星', top:true, cond:function(s){ return s.child.kingStarsBest >= 25; } },
+  { id:'a22', icon:'🎁', name:'首开纪录', desc:'开出第 1 个盲盒', top:false, cond:function(s){ return s.child.openedBoxes.length >= 1; } },
+  { id:'a23', icon:'🎁', name:'盲盒收藏家', desc:'累计开 30 个盲盒', top:false, cond:function(s){ return s.child.openedBoxes.length >= 30; } },
+  { id:'a24', icon:'🌠', name:'天选之人', desc:'开出一天自由安排日', top:false, cond:function(s){ return s.child.openedBoxes.some(function(b){ return b.item === 'freeDay'; }); } },
+  { id:'a25', icon:'💰', name:'小金库', desc:'累计积分收入 1000', top:false, cond:function(s){ return incomeSum(s) >= 1000; } },
+  { id:'a26', icon:'💰', name:'万分俱乐部', desc:'累计积分收入 5000', top:false, cond:function(s){ return incomeSum(s) >= 5000; } },
+  { id:'a27', icon:'🧧', name:'第一桶金', desc:'首次兑换现金', top:false, cond:function(s){ return s.child.redeemRecords.length >= 1; } },
+  { id:'a28', icon:'🧧', name:'理财达人', desc:'累计兑换 500 分', top:false, cond:function(s){ var n=0; s.child.redeemRecords.forEach(function(r){ n+=r.points; }); return n >= 500; } },
+  { id:'a29', icon:'⏫', name:'时机大师', desc:'激活双倍卡 5 次', top:false, cond:function(s){ return s.child.buffHistory.length >= 5; } }
+];
+
+function totalCheckins(s) {
+  var n = 0;
+  Object.keys(s.child.checkins).forEach(function (d) {
+    var day = s.child.checkins[d];
+    Object.keys(day).forEach(function (tid) { n += day[tid]; });
+  });
+  return n;
+}
+function taskTxCount(s, name) {
+  var n = 0;
+  s.child.transactions.forEach(function (t) {
+    if (t.type === '任务积分' && t.desc && t.desc.indexOf(name) >= 0) n++;
+  });
+  return n;
+}
+function readHours(s) { return taskTxCount(s, '阅读时间') * 0.5; }
+function incomeSum(s) {
+  var n = 0;
+  s.child.transactions.forEach(function (t) { if (t.amount > 0) n += t.amount; });
+  return n;
+}
+function shortOrder(short) { return TIER_GROUPS.indexOf(short); }
+function bestShortIdx(s, h) {
+  var li = s.child.bestLevelIdx || 0;
+  if (li >= s.config.tiers.length) return shortOrder('王者');
+  return shortOrder(s.config.tiers[li].short);
 }
 
 function seed() {
   return {
-    version: 1,
+    version: 3,
     child: {
       name: '陈明哲',
       points: 620,
@@ -442,47 +613,89 @@ function seed() {
       ],
       blindboxes: [],
       openedBoxes: [],
+      pityCount: 0,
       tierHistory: [
-        { date:'2026-09-03', from:'旧体系·倔强青铜Ⅲ', to:'黄金一星', grand:true, note:'按新版 21 档门槛表重算（620 分）' }
+        { date:'2026-09-03', from:'旧体系·倔强青铜Ⅲ', to:'秩序白银Ⅱ', grand:true, note:'V3 段位重制（王者荣耀制）按 620 分重算' }
       ],
       redeemRecords: [],
-      birthdayGivenYear: 0,
-      weekBonusGiven: '',
-      monthBonusGiven: '',
-      boxSeq: 1
+      birthdayGivenYear: 0, weekBonusGiven: '', monthBonusGiven: '', hundredBonusGiven: false,
+      boxSeq: 1,
+      items: { dbDay:0, dbWeek:0, game1:0, game3:0, freeDay:0 },
+      activeBuff: null,
+      buffHistory: [],
+      couponUsed: [],
+      titlesOwned: [],
+      equippedTitle: null,
+      achievementsDone: [],
+      bestLevelIdx: 4,
+      kingStarsBest: 0
     },
     pending: [],
     config: {
       password: '720720',
       tasks: defaultTasks(),
       tiers: defaultTiers(),
+      king: defaultKing(),
       milestones: defaultMilestones(),
-      system: { exchangeRate: 10, weekBonus: 50, monthBonus: 300, birthday: 500, birthdayMult: 2.0, birthdayDate: '07-20' }
+      system: { exchangeRate:10, weekBonus:50, monthBonus:300, hundredBonus:800, birthday:500, birthdayMult:2.0, birthdayDate:'07-20', pity:10 }
     },
+    lastExportAt: null,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
 }
 
-/* ================= 状态 ================= */
+/* ================= 状态与迁移 ================= */
 var S = null;
 function load() {
   try {
     var raw = localStorage.getItem(STORE_KEY);
     if (raw) {
       S = JSON.parse(raw);
-      /* v2 规则迁移：旧版 6 任务（无 group 字段）→ 换新 13 任务四类规则；
-         当日打卡/待确认清零重计，积分/流水/段位/盲盒全部保留 */
-      if (S && S.config && S.config.tasks && S.config.tasks.length && !S.config.tasks[0].group) {
-        S.config.tasks = defaultTasks();
-        delete S.child.checkins[todayStr()];
-        S.pending = [];
-        save();
-      }
+      if (S && S.version !== 3) migrateV3();
       return;
     }
   } catch (e) { }
   S = seed(); save();
+}
+function migrateV3() {
+  /* v1/v2 → v3：换王者段位制与 14 任务；积分/流水/开盒/兑换保留；
+     任务与段位配置重置为 V3 默认（自定义分值需重新设置），成就道具称号从零开始 */
+  var oldName = '';
+  try {
+    var ts = S.config.tiers || [];
+    for (var i = 0; i < ts.length; i++) if (S.child.points >= ts[i].threshold) oldName = ts[i].name;
+  } catch (e2) { }
+  S.version = 3;
+  S.config.tasks = defaultTasks();
+  S.config.tiers = defaultTiers();
+  S.config.king = defaultKing();
+  S.config.system = { exchangeRate:10, weekBonus:50, monthBonus:300, hundredBonus:800, birthday:500, birthdayMult:2.0, birthdayDate:'07-20', pity:10 };
+  if (!S.lastExportAt && S.lastExportAt !== null) S.lastExportAt = null;
+  var c = S.child;
+  c.items = c.items || { dbDay:0, dbWeek:0, game1:0, game3:0, freeDay:0 };
+  c.activeBuff = null; c.buffHistory = c.buffHistory || [];
+  c.couponUsed = c.couponUsed || []; c.titlesOwned = []; c.equippedTitle = null;
+  c.achievementsDone = []; c.pityCount = 0;
+  /* checkins 数组格式 → 计数格式 */
+  var nc = {};
+  Object.keys(c.checkins || {}).forEach(function (d) {
+    var v = c.checkins[d], obj = {};
+    if (Array.isArray(v)) { v.forEach(function (tid) { obj[tid] = (obj[tid] || 0) + 1; }); }
+    else { obj = v; }
+    nc[d] = obj;
+  });
+  c.checkins = nc;
+  /* 旧版开盒记录没有 item 字段，统一补为 points */
+  (c.openedBoxes || []).forEach(function (b) { if (!b.item) b.item = 'points'; });
+  S.pending = [];
+  var info = levelInfo(c.points);
+  c.bestLevelIdx = info.isKing ? S.config.tiers.length : info.idx;
+  c.kingStarsBest = info.isKing ? info.kingStars : 0;
+  c.tierHistory = c.tierHistory || [];
+  c.tierHistory.unshift({ date: todayStr(), from: oldName || '旧版本段位', to: info.name, grand: false,
+    note: 'V3 段位重制（王者荣耀制）自动重算' });
+  save();
 }
 function save() {
   S.updatedAt = new Date().toISOString();
@@ -497,57 +710,108 @@ function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function
 function todayStr() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
 function fmtDate(iso) { return (iso || '').slice(5).replace('-', '/'); }
 function nowTime() { var d = new Date(); return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0'); }
-
+function addDays(dateStr, n) {
+  var p = dateStr.split('-'); var d = new Date(+p[0], +p[1]-1, +p[2]); d.setDate(d.getDate() + n);
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
 var toastTimer = null;
 function toast(msg) {
   var t = $('toast'); t.textContent = msg; t.classList.add('on');
-  clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('on'); }, 2200);
+  clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('on'); }, 2400);
 }
 
 /* ================= 段位逻辑 ================= */
-function tierIdx(points) {
+function levelIdxOf(points) {
   var ts = S.config.tiers, idx = 0;
   for (var i = 0; i < ts.length; i++) { if (points >= ts[i].threshold) idx = i; }
   return idx;
 }
-function curTier() { return S.config.tiers[tierIdx(S.child.points)]; }
-function nextTierOf() { var i = tierIdx(S.child.points); return i + 1 < S.config.tiers.length ? S.config.tiers[i+1] : null; }
-function bonusOf() { return curTier().bonus; }
+function levelInfo(points) {
+  var k = S.config.king;
+  if (points >= k.entry) {
+    return { isKing: true, idx: S.config.tiers.length, kingStars: Math.floor((points - k.entry) / k.perStar),
+      name: TIER_FULL['王者'], short: '王者', stars: 0, maxStars: 0, bonus: k.bonus, threshold: k.entry };
+  }
+  var idx = levelIdxOf(points), t = S.config.tiers[idx];
+  var next = idx + 1 < S.config.tiers.length ? S.config.tiers[idx + 1] : { threshold: k.entry };
+  var span = Math.max(1, next.threshold - t.threshold);
+  var stars = Math.min(t.stars - 1, Math.floor((points - t.threshold) / span * t.stars));
+  return { isKing: false, idx: idx, kingStars: 0, name: t.name, short: t.short, stars: stars,
+    maxStars: t.stars, bonus: t.bonus, threshold: t.threshold };
+}
+function curLevel() { return levelInfo(S.child.points); }
+function nextMilestone() {
+  var info = levelInfo(S.child.points);
+  if (info.isKing) {
+    var k = S.config.king;
+    var nextAt = k.entry + (info.kingStars + 1) * k.perStar;
+    return { name: '王者 ' + (info.kingStars + 1) + '★', pointsNeeded: nextAt - S.child.points, threshold: info.threshold, span: k.perStar };
+  }
+  var next = info.idx + 1 < S.config.tiers.length ? S.config.tiers[info.idx + 1] : { name: TIER_FULL['王者'], threshold: S.config.king.entry };
+  var span = next.threshold - info.threshold;
+  return { name: next.name, pointsNeeded: next.threshold - S.child.points, threshold: info.threshold, span: span };
+}
 
-/* 生日周口径沿用旧银行：每年 7/17 ~ 7/23 */
+/* ================= 倍率 ================= */
 function inBirthdayWeek() {
-  var sys = S.config.system, d = new Date();
+  var d = new Date();
   var md = (d.getMonth()+1) * 100 + d.getDate();
   return md >= 717 && md <= 723;
 }
-function earnMultiplier() { return bonusOf() * (inBirthdayWeek() ? S.config.system.birthdayMult : 1); }
+function buffActive() {
+  var b = S.child.activeBuff;
+  if (!b) return false;
+  return todayStr() <= b.expire;
+}
+function buffLeftDays() {
+  var b = S.child.activeBuff;
+  if (!b || !buffActive()) return 0;
+  var p = todayStr().split('-'), e = b.expire.split('-');
+  var d1 = new Date(+p[0], +p[1]-1, +p[2]), d2 = new Date(+e[0], +e[1]-1, +e[2]);
+  return Math.round((d2 - d1) / 86400000) + 1;
+}
+function earnMultiplier() {
+  var doubled = inBirthdayWeek() || buffActive();
+  return curLevel().bonus * (doubled ? 2 : 1);
+}
 
 /* ================= 记账核心 ================= */
+function grantBox(kind) {
+  var box = { id: 'b' + (S.child.boxSeq++), kind: kind, ts: new Date().toISOString() };
+  S.child.blindboxes.push(box);
+  return box;
+}
 function addPoints(delta, type, desc) {
-  var before = tierIdx(S.child.points);
+  var before = levelInfo(S.child.points);
   S.child.points = Math.max(0, S.child.points + delta);
   S.child.transactions.unshift({ date: todayStr(), type: type, amount: delta, desc: desc || '' });
-  if (S.child.transactions.length > 200) S.child.transactions.length = 200;
-  var after = tierIdx(S.child.points);
-  if (after > before) {
-    var crossGrand = S.config.tiers[after].short !== S.config.tiers[before].short;
-    S.child.tierHistory.unshift({
-      date: todayStr(), from: S.config.tiers[before].name, to: S.config.tiers[after].name,
-      grand: crossGrand, note: ''
-    });
-    var box = { id: 'b' + (S.child.boxSeq++), kind: crossGrand ? 'grand' : 'normal',
-      range: crossGrand ? [50, 200] : [20, 50], ts: new Date().toISOString() };
-    S.child.blindboxes.push(box);
-    toast('🎉 升级到 ' + S.config.tiers[after].name + '！获得' + (crossGrand ? '高级' : '普通') + '盲盒一个');
+  if (S.child.transactions.length > 300) S.child.transactions.length = 300;
+  var after = levelInfo(S.child.points);
+  if (after.idx > before.idx) {
+    var crossGrand = after.short !== before.short;
+    var entry = { date: todayStr(), from: before.name, to: after.name, grand: crossGrand, note: '' };
+    if (after.isKing) entry.note = '晋级最强王者！';
+    S.child.tierHistory.unshift(entry);
+    if (after.idx > (S.child.bestLevelIdx || 0)) S.child.bestLevelIdx = after.idx;
+    grantBox(crossGrand ? 'grand' : 'normal');
+    showCelebrate(crossGrand || after.isKing, after);
+  } else if (after.isKing && before.isKing && after.kingStars > before.kingStars) {
+    for (var st = before.kingStars + 1; st <= after.kingStars; st++) {
+      S.child.tierHistory.unshift({ date: todayStr(), from: '王者 ' + before.kingStars + '★', to: '王者 ' + st + '★', grand: false, note: '' });
+      grantBox('normal');
+      if (st === S.config.king.legendStar) { grantBox('grand'); grantTitle('legendKing'); showCelebrate(true, { short:'王者', name:'传奇王者 · 王者25★' }); }
+      if (st === S.config.king.gloryStar) { grantBox('grand'); grantTitle('gloryKing'); showCelebrate(true, { short:'王者', name:'荣耀王者 · 王者50★' }); }
+    }
+    if (after.kingStars > (S.child.kingStarsBest || 0)) S.child.kingStarsBest = after.kingStars;
   }
   save();
 }
 
-/* 全勤：当天全部启用的基础四项都有确认记录 */
+/* ================= 全勤/生日 ================= */
 function isFullDay(dateStr) {
-  var done = S.child.checkins[dateStr] || [];
+  var done = S.child.checkins[dateStr] || {};
   var en = S.config.tasks.filter(function (t) { return t.enabled && t.group === 'basic'; });
-  return en.length > 0 && en.every(function (t) { return done.indexOf(t.id) >= 0; });
+  return en.length > 0 && en.every(function (t) { return (done[t.id] || 0) >= 1; });
 }
 function streakDays() {
   var n = 0, d = new Date();
@@ -557,6 +821,7 @@ function streakDays() {
   }
   return n;
 }
+function weekKey() { var d = new Date(); var mon = new Date(d); mon.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return mon.toISOString().slice(0, 10); }
 function checkAttendanceBonus() {
   var st = streakDays(), sys = S.config.system;
   var wk = 'W' + weekKey();
@@ -570,9 +835,12 @@ function checkAttendanceBonus() {
     addPoints(sys.monthBonus, '连续全勤奖', '连续 ' + st + ' 天全勤（月奖）');
     toast('🔥 连续全勤 ' + st + ' 天，月度大奖 +' + sys.monthBonus);
   }
+  if (st >= 100 && !S.child.hundredBonusGiven) {
+    S.child.hundredBonusGiven = true;
+    addPoints(sys.hundredBonus, '连续全勤奖', '连续 ' + st + ' 天全勤（百日传奇奖）');
+    toast('👑 百日传奇达成！+' + sys.hundredBonus);
+  }
 }
-function weekKey() { var d = new Date(); var mon = new Date(d); mon.setDate(d.getDate() - ((d.getDay() + 6) % 7)); return mon.toISOString().slice(0, 10); }
-
 function checkBirthday() {
   var sys = S.config.system, d = new Date();
   var md = (d.getMonth()+1) * 100 + d.getDate();
@@ -586,14 +854,25 @@ function checkBirthday() {
 }
 
 /* ================= 打卡/确认 ================= */
-function taskDoneToday(tid) {
-  var done = S.child.checkins[todayStr()] || [];
-  var pend = S.pending.some(function (p) { return p.task === tid; });
-  return done.indexOf(tid) >= 0 || pend;
+function checkinCountToday(tid) {
+  var done = S.child.checkins[todayStr()] || {};
+  return done[tid] || 0;
+}
+function pendingCount(tid) {
+  var n = 0;
+  S.pending.forEach(function (p) { if (p.kind === 'checkin' && p.task === tid) n++; });
+  return n;
+}
+function taskFullToday(task) {
+  var max = task.maxPerDay || 1;
+  return checkinCountToday(task.id) + pendingCount(task.id) >= max;
+}
+function taskDoneToday(task) {
+  return checkinCountToday(task.id) + pendingCount(task.id) >= 1;
 }
 function doCheckin(task) {
-  if (taskDoneToday(task.id)) return;
-  S.pending.push({ id: 'p' + Date.now() + Math.floor(Math.random()*100), task: task.id, ts: nowTime() });
+  if (taskFullToday(task)) return;
+  S.pending.push({ id: 'p' + Date.now() + Math.floor(Math.random()*100), kind:'checkin', task: task.id, ts: nowTime() });
   save(); renderAll();
   toast('已打卡，等家长确认 ✋');
 }
@@ -605,18 +884,26 @@ function confirmPending(pid) {
   var i = S.pending.findIndex(function (p) { return p.id === pid; });
   if (i < 0) return;
   var p = S.pending[i];
-  var task = findTask(p.task);
   S.pending.splice(i, 1);
+  if (p.kind === 'coupon') {
+    S.child.items[p.item] = Math.max(0, (S.child.items[p.item] || 0) - 1);
+    S.child.couponUsed.unshift({ item: p.item, date: todayStr() });
+    save(); renderAll();
+    toast('已核销：' + ITEM_META[p.item].name + ' 🎉');
+    return;
+  }
+  var task = findTask(p.task);
   if (!task) { save(); renderAll(); return; }
   var mult = earnMultiplier();
   var got = Math.round(task.points * mult);
-  var desc = task.name + ' ×' + mult.toFixed(2) + ' 加成' + (inBirthdayWeek() ? '（生日周双倍）' : '');
+  var desc = task.name + ' ×' + mult.toFixed(2) + ' 加成' + (buffActive() ? '（双倍卡）' : '') + (inBirthdayWeek() ? '（生日周双倍）' : '');
   addPoints(got, '任务积分', desc);
-  var done = S.child.checkins[todayStr()] || [];
-  done.push(task.id);
+  var done = S.child.checkins[todayStr()] || {};
+  done[task.id] = (done[task.id] || 0) + 1;
   S.child.checkins[todayStr()] = done;
   checkAttendanceBonus();
   checkBirthday();
+  checkAchievements();
   save(); renderAll();
   toast('+' + got + ' 分到账 💰');
 }
@@ -627,25 +914,110 @@ function rejectPending(pid) {
   toast('已驳回');
 }
 
-/* ================= 开盒 ================= */
+/* ================= 盲盒 ================= */
+function weightedPick(pool) {
+  var total = 0; pool.forEach(function (e) { total += e.w; });
+  var r = Math.random() * total;
+  for (var i = 0; i < pool.length; i++) { r -= pool[i].w; if (r <= 0) return pool[i].item; }
+  return pool[pool.length - 1].item;
+}
 function openBox(bid) {
   var i = S.child.blindboxes.findIndex(function (b) { return b.id === bid; });
   if (i < 0) return;
   var box = S.child.blindboxes[i];
-  var got = box.range[0] + Math.floor(Math.random() * (box.range[1] - box.range[0] + 1));
   S.child.blindboxes.splice(i, 1);
-  addPoints(got, '盲盒奖励', (box.kind === 'grand' ? '高级盲盒' : '普通盲盒') + ' 开出 +' + got);
-  S.child.openedBoxes.unshift({ id: box.id, kind: box.kind, got: got, ts: new Date().toISOString() });
+  var pool = BOX_POOLS[box.kind === 'normal' ? 'normal' : 'grand'];
+  var item;
+  var pity = S.config.system.pity || 10;
+  if (S.child.pityCount + 1 >= pity) {
+    var nonPts = pool.filter(function (e) { return e.item !== 'points'; });
+    item = weightedPick(nonPts);
+  } else {
+    item = weightedPick(pool);
+  }
+  var result;
+  if (item === 'points') {
+    S.child.pityCount++;
+    var rg = BOX_KIND_META[box.kind].range;
+    var got = rg[0] + Math.floor(Math.random() * (rg[1] - rg[0] + 1));
+    addPoints(got, '盲盒奖励', BOX_KIND_META[box.kind].name + ' 开出 +' + got);
+    result = { item: 'points', got: got };
+  } else {
+    S.child.pityCount = 0;
+    S.child.items[item] = (S.child.items[item] || 0) + 1;
+    if (item === 'dbWeek') grantTitle('rateMaster');
+    if (item === 'game3') grantTitle('timeLord');
+    if (item === 'freeDay') grantTitle('freeGod');
+    save();
+    result = { item: item, got: 0 };
+  }
+  S.child.openedBoxes.unshift({ id: box.id, kind: box.kind, item: result.item, got: result.got, ts: new Date().toISOString() });
+  checkAchievements();
   save(); renderAll();
-  showBoxResult(box.kind, got);
+  showBoxResult(box.kind, result);
+  if (RARE_ITEMS.indexOf(result.item) >= 0) confettiBurst();
 }
-function showBoxResult(kind, got) {
-  openSheet('<div class="sheet-head"><div class="t">🎁 开盒结果</div>' +
-    '<button class="sheet-close" onclick="closeSheet()">✕</button></div>' +
-    '<div class="box-anim"><span class="big">' + (kind === 'grand' ? '🏆' : '🎁') + '</span>' +
-    '<div class="txt">' + (kind === 'grand' ? '高级盲盒开出' : '普通盲盒开出') + '</div>' +
-    '<div class="res">+' + got + ' 分</div>' +
-    '<button class="big-btn" onclick="closeSheet()">收下！</button></div>');
+function showBoxResult(kind, result) {
+  var m = ITEM_META[result.item];
+  var html = '<div class="sheet-head"><div class="t">🎁 开盒结果</div>' +
+    '<button class="sheet-close" onclick="closeSheet()">✕</button></div><div class="box-anim">' +
+    '<span class="big">' + (result.item === 'points' ? BOX_KIND_META[kind].icon : m.icon) + '</span>' +
+    '<div class="txt">' + BOX_KIND_META[kind].name + '开出</div>' +
+    (result.item === 'points'
+      ? '<div class="res">+' + result.got + ' 分</div>'
+      : '<div class="res card">' + m.name + '</div><div class="txt" style="margin-top:6px">已放进背包 🎒</div>') +
+    '<button class="big-btn" onclick="closeSheet()">收下！</button></div>';
+  openSheet(html);
+}
+
+/* ================= 道具 ================= */
+function activateBuff(type) {
+  if (!buffActive() && S.child.items[type] > 0) {
+    S.child.items[type]--;
+    var days = type === 'dbWeek' ? 7 : 1;
+    S.child.activeBuff = { type: type, start: todayStr(), days: days, expire: addDays(todayStr(), days - 1) };
+    S.child.buffHistory.unshift({ type: type, start: todayStr(), days: days });
+    save(); checkAchievements(); renderAll();
+    toast('⚡ 双倍积分卡已激活，' + days + ' 天内任务积分 ×2');
+  }
+}
+function useCoupon(item) {
+  if ((S.child.items[item] || 0) <= 0) return;
+  S.pending.push({ id: 'p' + Date.now() + Math.floor(Math.random()*100), kind: 'coupon', item: item, ts: nowTime() });
+  save(); renderAll();
+  toast('已申请使用，等家长确认 📩');
+}
+
+/* ================= 称号 ================= */
+function grantTitle(tid) {
+  if (S.child.titlesOwned.indexOf(tid) < 0) {
+    S.child.titlesOwned.push(tid);
+    var t = TITLES.find(function (x) { return x.id === tid; });
+    toast('👑 获得限定称号：「' + (t ? t.name : tid) + '」');
+    save();
+  }
+}
+
+/* ================= 成就 ================= */
+function checkAchievements() {
+  var h = heroHook();
+  ACHIEVEMENTS.forEach(function (a) {
+    if (S.child.achievementsDone.indexOf(a.id) >= 0) return;
+    var ok = false;
+    try { ok = !!a.cond(S, h); } catch (e) { ok = false; }
+    if (ok) {
+      S.child.achievementsDone.push(a.id);
+      toast('🏆 达成成就：「' + a.name + '」');
+      if (a.top) {
+        grantBox('memorial');
+        toast('🎖️ 顶级成就！奖励纪念盲盒一个');
+      }
+    }
+  });
+  save();
+}
+function heroHook() {
+  return { streakDays: streakDays, levelInfo: levelInfo };
 }
 
 /* ================= 兑换记账（家长） ================= */
@@ -674,6 +1046,7 @@ function openRedeemSheet() {
     var yuan = +(pts / rate).toFixed(1);
     addPoints(-pts, '兑换现金', '兑换 ' + yuan + ' 元' + ($('rdNote').value ? '（' + $('rdNote').value + '）' : ''));
     S.child.redeemRecords.unshift({ date: todayStr(), points: pts, yuan: yuan, note: $('rdNote').value || '' });
+    checkAchievements();
     save(); renderAll();
     toast('已兑换 ' + yuan + ' 元，记得线下发钱 🧧');
     openRedeemSheet();
@@ -699,8 +1072,7 @@ function openAdminSheet() {
     '<button data-at="tasks">任务积分</button><button data-at="tiers">段位门槛</button>' +
     '<button data-at="ms">里程碑</button><button data-at="sys">系统配置</button></div>' +
     '<div id="adminBody"></div>');
-  var btns = document.querySelectorAll('.sub-tabs button');
-  btns.forEach(function (b) {
+  document.querySelectorAll('.sub-tabs button').forEach(function (b) {
     b.addEventListener('click', function () { adminTab = b.dataset.at; renderAdmin(); });
   });
   renderAdmin();
@@ -722,13 +1094,14 @@ function renderAdminTasks(el) {
     S.config.tasks.forEach(function (t, i) {
       if (t.group !== g.key) return;
       html += '<div class="cfg-row"><div class="cfg-name">' + t.icon + ' ' + esc(t.name) +
-        '<span class="s">基础积分</span></div>' +
-        '<input class="cfg-num" type="number" data-ti="' + i + '" value="' + t.points + '">' +
+        '<span class="s">基础积分 / 每日次数</span></div>' +
+        '<input class="cfg-num sm" type="number" data-tp="' + i + '" value="' + t.points + '">' +
+        '<input class="cfg-num sm" type="number" data-tn="' + i + '" value="' + (t.maxPerDay || 1) + '">' +
         '<div class="cfg-tog ' + (t.enabled ? 'on' : '') + '" data-tg="' + i + '"></div></div>';
     });
   });
   html += '<button class="big-btn" id="saveTasks">保存任务设置</button>' +
-    '<div class="small-note">开关=任务是否启用（禁用后孩子端不显示）；全勤=基础四项当天全部确认</div>';
+    '<div class="small-note">开关=任务是否启用；阅读等多打卡任务改「每日次数」；全勤=基础四项当天全部确认</div>';
   el.innerHTML = html;
   el.querySelectorAll('.cfg-tog').forEach(function (tg) {
     tg.addEventListener('click', function () {
@@ -736,9 +1109,11 @@ function renderAdminTasks(el) {
     });
   });
   $('saveTasks').addEventListener('click', function () {
-    el.querySelectorAll('.cfg-num').forEach(function (n) {
-      var v = Math.max(0, parseInt(n.value, 10) || 0);
-      S.config.tasks[+n.dataset.ti].points = v;
+    el.querySelectorAll('[data-tp]').forEach(function (n) {
+      S.config.tasks[+n.dataset.tp].points = Math.max(0, parseInt(n.value, 10) || 0);
+    });
+    el.querySelectorAll('[data-tn]').forEach(function (n) {
+      S.config.tasks[+n.dataset.tn].maxPerDay = Math.max(1, parseInt(n.value, 10) || 1);
     });
     save(); renderAll(); toast('任务设置已保存 ✅');
   });
@@ -746,10 +1121,19 @@ function renderAdminTasks(el) {
 function renderAdminTiers(el) {
   var html = '';
   TIER_GROUPS.forEach(function (g) {
-    html += '<div class="tiergrp"><div class="g-name">' + g + ' · 加成 <input class="cfg-num" style="width:70px;display:inline-block;padding:2px" type="number" step="0.05" data-grp="' + g + '" value="' + bonusOfGroup(g) + '">× </div><div class="g-row">';
+    if (g === '王者') {
+      var k = S.config.king;
+      html += '<div class="tiergrp"><div class="g-name">👑 最强王者（按星无限）</div>' +
+        '<div class="cfg-row"><div class="cfg-name">进入王者门槛<span class="s">积分</span></div><input class="cfg-num" type="number" data-kk="entry" value="' + k.entry + '"></div>' +
+        '<div class="cfg-row"><div class="cfg-name">每颗王者星<span class="s">所需积分</span></div><input class="cfg-num" type="number" data-kk="perStar" value="' + k.perStar + '"></div>' +
+        '<div class="cfg-row"><div class="cfg-name">传奇王者<span class="s">星数</span></div><input class="cfg-num" type="number" data-kk="legendStar" value="' + k.legendStar + '"></div>' +
+        '<div class="cfg-row"><div class="cfg-name">荣耀王者<span class="s">星数</span></div><input class="cfg-num" type="number" data-kk="gloryStar" value="' + k.gloryStar + '"></div></div>';
+      return;
+    }
+    html += '<div class="tiergrp"><div class="g-name">' + TIER_EMOJI[g] + ' ' + TIER_FULL[g] + ' · 加成 <input class="cfg-num sm" style="display:inline-block;height:32px;padding:2px" type="number" step="0.05" data-grp="' + g + '" value="' + bonusOfGroup(g) + '">× </div><div class="g-row">';
     S.config.tiers.forEach(function (t, i) {
       if (t.short !== g) return;
-      html += '<div class="g-cell"><div class="cn">' + t.name.slice(-3) + '</div>' +
+      html += '<div class="g-cell"><div class="cn">' + t.name.slice(-1) + '级·' + t.stars + '星</div>' +
         '<input type="number" data-tv="' + i + '" value="' + t.threshold + '"></div>';
     });
     html += '</div></div>';
@@ -764,6 +1148,9 @@ function renderAdminTiers(el) {
       var b = Math.max(1, parseFloat(n.value) || 1);
       S.config.tiers.forEach(function (t) { if (t.short === n.dataset.grp) t.bonus = b; });
     });
+    el.querySelectorAll('[data-kk]').forEach(function (n) {
+      S.config.king[n.dataset.kk] = Math.max(1, parseInt(n.value, 10) || 1);
+    });
     S.config.tiers.sort(function (a, b) { return a.threshold - b.threshold; });
     save(); renderAll(); toast('段位设置已保存 ✅');
   });
@@ -774,7 +1161,7 @@ function bonusOfGroup(g) {
 }
 function renderAdminMs(el) {
   var html = S.config.milestones.map(function (m, i) {
-    var reached = tierIdx(S.child.points) >= tierIndexOfShort(m.tier);
+    var reached = levelIdxOf(S.child.points) >= tierIndexOfShort(m.tier) || (m.tier === '王者' && S.child.points >= S.config.king.entry);
     return '<div class="ms-card ' + (m.granted ? 'done' : (reached ? 'reach' : '')) + '">' +
       '<div class="ms-top"><span class="ms-tier">' + esc(m.tier) + '</span>' +
       '<span class="ms-name">' + esc(m.name) + '</span>' +
@@ -805,6 +1192,7 @@ function renderAdminMs(el) {
   $('addMs').addEventListener('click', function () { msForm(-1); });
 }
 function tierIndexOfShort(short) {
+  if (short === '王者') return S.config.tiers.length;
   for (var i = 0; i < S.config.tiers.length; i++) if (S.config.tiers[i].short === short) return i;
   return -1;
 }
@@ -832,21 +1220,34 @@ function renderAdminSys(el) {
     '<div class="cfg-row"><div class="cfg-name">兑换比例<span class="s">多少积分 = 1 元</span></div><input class="cfg-num" type="number" data-sk="exchangeRate" value="' + sys.exchangeRate + '"></div>' +
     '<div class="cfg-row"><div class="cfg-name">连续 7 天全勤奖<span class="s">达成奖励积分</span></div><input class="cfg-num" type="number" data-sk="weekBonus" value="' + sys.weekBonus + '"></div>' +
     '<div class="cfg-row"><div class="cfg-name">连续 30 天全勤奖<span class="s">达成奖励积分</span></div><input class="cfg-num" type="number" data-sk="monthBonus" value="' + sys.monthBonus + '"></div>' +
+    '<div class="cfg-row"><div class="cfg-name">连续 100 天全勤奖<span class="s">百日传奇</span></div><input class="cfg-num" type="number" data-sk="hundredBonus" value="' + sys.hundredBonus + '"></div>' +
     '<div class="cfg-row"><div class="cfg-name">生日当天赠送<span class="s">生日积分</span></div><input class="cfg-num" type="number" data-sk="birthday" value="' + sys.birthday + '"></div>' +
     '<div class="cfg-row"><div class="cfg-name">生日周倍率<span class="s">生日周任务积分倍率</span></div><input class="cfg-num" type="number" step="0.1" data-sk="birthdayMult" value="' + sys.birthdayMult + '"></div>' +
     '<div class="cfg-row"><div class="cfg-name">生日日期<span class="s">月-日</span></div><input class="cfg-num" type="text" data-sk="birthdayDate" value="' + sys.birthdayDate + '"></div>' +
-    '<div class="cfg-row"><div class="cfg-name">家长口令<span class="s">进入家长模式用</span></div><input class="cfg-num" type="text" data-sk="password" value="' + esc(sys ? '' : '') + '" placeholder="见下方说明"></div>' +
+    '<div class="cfg-row"><div class="cfg-name">盲盒保底<span class="s">累计几盒必出道具</span></div><input class="cfg-num" type="number" data-sk="pity" value="' + sys.pity + '"></div>' +
     '<button class="big-btn" id="saveSys">保存系统配置</button>' +
-    '<div class="small-note">口令默认 720720；如需修改请直接改本机数据（防止误触，界面不回显）</div>';
-  el.querySelector('[data-sk="password"]').closest('.cfg-row').style.display = 'none';
+    '<div style="margin-top:18px" class="grp-title">🔑 修改家长口令</div>' +
+    '<div class="f-row"><div class="f-label">旧口令</div><input class="f-input" id="pwOld" type="password"></div>' +
+    '<div class="f-2col"><div class="f-row"><div class="f-label">新口令</div><input class="f-input" id="pwNew" type="password"></div>' +
+    '<div class="f-row"><div class="f-label">再输一遍</div><input class="f-input" id="pwNew2" type="password"></div></div>' +
+    '<button class="ghost-btn" id="pwSave">修改口令</button>';
   $('saveSys').addEventListener('click', function () {
     el.querySelectorAll('[data-sk]').forEach(function (n) {
       var k = n.dataset.sk;
-      if (k === 'birthdayDate' || k === 'password') return;
-      S.config.system[k] = k === 'birthdayMult' ? Math.max(1, parseFloat(n.value) || 1) : Math.max(0, parseInt(n.value, 10) || 0);
+      if (k === 'birthdayDate') return;
+      S.config.system[k] = (k === 'birthdayMult') ? Math.max(1, parseFloat(n.value) || 1) : Math.max(1, parseInt(n.value, 10) || 1);
     });
     S.config.system.birthdayDate = el.querySelector('[data-sk="birthdayDate"]').value.trim() || '07-20';
     save(); renderAll(); toast('系统配置已保存 ✅');
+  });
+  $('pwSave').addEventListener('click', function () {
+    if ($('pwOld').value !== S.config.password) { toast('旧口令不对'); return; }
+    var nw = $('pwNew').value;
+    if (nw.length < 4) { toast('新口令至少 4 位'); return; }
+    if (nw !== $('pwNew2').value) { toast('两次输入不一致'); return; }
+    S.config.password = nw; save();
+    $('pwOld').value = ''; $('pwNew').value = ''; $('pwNew2').value = '';
+    toast('口令已修改 ✅');
   });
 }
 
@@ -867,6 +1268,7 @@ function openDataSheet() {
     a.href = URL.createObjectURL(blob);
     a.download = '成长小英雄备份-' + todayStr() + '.json';
     a.click(); URL.revokeObjectURL(a.href);
+    S.lastExportAt = new Date().toISOString(); save(); renderAll();
     toast('备份已下载 📥');
   });
   $('dmCopy').addEventListener('click', function () {
@@ -882,29 +1284,62 @@ function openDataSheet() {
     if (!raw) { toast('先粘贴备份文本'); return; }
     try {
       var obj = JSON.parse(raw);
-      if (!obj || obj.version !== 1 || !obj.child || !obj.config) throw new Error('结构不对');
+      if (!obj || obj.version !== 3 || !obj.child || !obj.config) throw new Error('结构不对');
       S = obj; save(); renderAll(); closeSheet();
       toast('导入成功 ✅ ' + obj.child.name + ' ' + obj.child.points + ' 分');
-    } catch (e) { toast('导入失败：不是有效的备份文件'); }
+    } catch (e) { toast('导入失败：不是有效的 V3 备份文件'); }
   });
   $('dmReset').addEventListener('click', function () {
-    if (confirm('确定重置？本机全部数据将清空，恢复到初始演示状态！')) {
+    if (confirm('确定重置？本机全部数据将清空，恢复到初始状态！')) {
       resetAll(); renderAll(); closeSheet(); toast('已重置');
     }
   });
 }
 
-/* ================= 弹层 ================= */
+/* ================= 弹层/庆祝/彩带 ================= */
 function openSheet(html) { $('sheet').innerHTML = html; $('mask').classList.add('on'); }
 function closeSheet() { $('mask').classList.remove('on'); }
 document.addEventListener('click', function (e) {
   if (e.target === $('mask')) closeSheet();
 });
+var celebTimer = null;
+function showCelebrate(grand, info) {
+  var c = $('celebrate');
+  var emoji = TIER_EMOJI[info.short] || '🎉';
+  var stars = '';
+  for (var i = 0; i < 8; i++) {
+    stars += '<span class="c-star" style="left:' + (8 + Math.random()*84) + '%;top:' + (20 + Math.random()*55) + '%;animation-delay:' + (Math.random()*0.8).toFixed(2) + 's">' + (Math.random() > 0.5 ? '⭐' : '✨') + '</span>';
+  }
+  c.className = grand ? 'grand' : '';
+  c.innerHTML = stars + '<div class="c-emoji">' + emoji + '</div>' +
+    '<div class="c-title">' + esc(info.name) + '</div>' +
+    '<div class="c-sub">' + (grand ? '🎉 恭喜晋级！' : '⬆️ 段位提升！') + '<br>盲盒已发放，去背包开盒 🎁</div>' +
+    '<div class="c-tap">点一下任意处继续</div>';
+  c.classList.add('on');
+  clearTimeout(celebTimer);
+  celebTimer = setTimeout(hideCelebrate, grand ? 4000 : 2600);
+}
+function hideCelebrate() { $('celebrate').classList.remove('on'); }
+$('celebrate').addEventListener('click', hideCelebrate);
+function confettiBurst() {
+  var colors = ['#FFD700', '#CD7F32', '#ff7b6b', '#7ee08a', '#4FC3F7', '#f5e6d0'];
+  for (var i = 0; i < 36; i++) {
+    var d = document.createElement('div');
+    d.className = 'confetti';
+    d.style.left = Math.random() * 100 + 'vw';
+    d.style.background = colors[i % colors.length];
+    d.style.animationDuration = (1.2 + Math.random() * 1.2) + 's';
+    d.style.animationDelay = (Math.random() * 0.5) + 's';
+    document.body.appendChild(d);
+    setTimeout(function (el) { return function () { el.remove(); }; }(d), 3200);
+  }
+}
 
 /* ================= 渲染 ================= */
 function renderHeader() {
-  $('hName').textContent = S.child.name + ' · ' + curTier().name;
-  $('hTier').textContent = S.child.points + ' 分 · 加成×' + bonusOf().toFixed(2);
+  var info = curLevel();
+  $('hName').textContent = S.child.name + ' · ' + (info.isKing ? info.name + ' ' + info.kingStars + '★' : info.name);
+  $('hTier').textContent = S.child.points + ' 分 · 加成×' + info.bonus.toFixed(2);
   var wd = ['日','一','二','三','四','五','六']; var d = new Date();
   $('hDate').textContent = (d.getMonth()+1) + '月' + d.getDate() + '日 周' + wd[d.getDay()];
   var isParent = sessionStorage.getItem('hero_parent') === '1';
@@ -912,12 +1347,27 @@ function renderHeader() {
   $('parentBtn').classList.toggle('on', isParent);
   $('parentBtn').textContent = isParent ? '家长模式中' : '家长入口';
   $('pbBadge').textContent = S.pending.length;
+  /* buff 条 */
+  if (buffActive()) {
+    $('buffStrip').classList.add('on');
+    $('buffLeft').textContent = (S.child.activeBuff.type === 'dbWeek' ? '周卡' : '天卡') + ' · 还剩 ' + buffLeftDays() + ' 天';
+  } else { $('buffStrip').classList.remove('on'); }
+  /* 备份提醒（仅家长模式） */
+  var need = isParent && (!S.lastExportAt || (Date.now() - new Date(S.lastExportAt).getTime()) > 7 * 86400000);
+  $('backupStrip').classList.toggle('on', !!need);
 }
 
 function renderHome() {
   var isParent = sessionStorage.getItem('hero_parent') === '1';
   $('pendCard').style.display = (isParent && S.pending.length) ? '' : 'none';
   $('pendList').innerHTML = S.pending.map(function (p) {
+    if (p.kind === 'coupon') {
+      var m = ITEM_META[p.item];
+      return '<div class="pend-row"><div class="box-ico" style="font-size:26px">' + m.icon + '</div>' +
+        '<div class="pend-info"><div class="n">使用「' + m.name + '」</div><div class="m">' + p.ts + ' 申请 · 确认后核销</div></div>' +
+        '<button class="mini-btn go" data-ok="' + p.id + '">确认</button>' +
+        '<button class="mini-btn no" data-no="' + p.id + '">驳回</button></div>';
+    }
     var t = findTask(p.task); if (!t) return '';
     var got = Math.round(t.points * earnMultiplier());
     return '<div class="pend-row"><div class="pend-info"><div class="n">' + t.icon + ' ' + esc(t.name) + '</div>' +
@@ -932,22 +1382,25 @@ function renderHome() {
     b.addEventListener('click', function () { rejectPending(b.dataset.no); });
   });
 
-  var done = S.child.checkins[todayStr()] || [];
+  var done = S.child.checkins[todayStr()] || {};
   var enAll = S.config.tasks.filter(function (t) { return t.enabled; });
   var enBasic = enAll.filter(function (t) { return t.group === 'basic'; });
-  var doneCnt = function (arr) { return arr.filter(function (t) { return done.indexOf(t.id) >= 0; }).length; };
+  var doneCnt = function (arr) { return arr.filter(function (t) { return (done[t.id] || 0) >= 1; }).length; };
   $('homeProgress').textContent = '全勤 ' + doneCnt(enBasic) + '/' + enBasic.length + ' · 任务 ' + doneCnt(enAll) + '/' + enAll.length;
   function rowHtml(t) {
     if (!t.enabled) return '';
-    var st = taskDoneToday(t.id);
-    var doneOk = done.indexOf(t.id) >= 0;
-    var cls = doneOk ? 'ck-done' : 'ck-wait';
-    var lab = doneOk ? '✓ 已到账' : (st ? '⏳ 待确认' : '');
-    var btn = st ? '<div class="' + cls + '">' + lab + '</div>' :
-      '<button class="ck-btn" data-ck="' + t.id + '">打卡</button>';
+    var max = t.maxPerDay || 1;
+    var used = checkinCountToday(t.id) + pendingCount(t.id);
+    var full = used >= max;
+    var any = used >= 1;
+    var cntTag = max > 1 ? '<span class="cnt">' + used + '/' + max + '</span>' : '';
+    var btn;
+    if (full) btn = '<div class="' + (any ? 'ck-done' : 'ck-wait') + '">' + (any ? '✓ 今日已满' : '⏳ 待确认') + '</div>';
+    else if (any) btn = '<button class="ck-btn" data-ck="' + t.id + '">再打卡</button>';
+    else btn = '<button class="ck-btn" data-ck="' + t.id + '">打卡</button>';
     return '<div class="task-row"><div class="task-ico">' + t.icon + '</div>' +
-      '<div class="task-info"><div class="n">' + esc(t.name) + '</div>' +
-      '<div class="p">基础 <b>' + t.points + '</b> 分 × 加成×' + bonusOf().toFixed(2) + ' = <b>' + Math.round(t.points * earnMultiplier()) + '</b> 分</div></div>' + btn + '</div>';
+      '<div class="task-info"><div class="n">' + esc(t.name) + cntTag + '</div>' +
+      '<div class="p">基础 <b>' + t.points + '</b> 分 × ×' + earnMultiplier().toFixed(2) + ' = <b>' + Math.round(t.points * earnMultiplier()) + '</b> 分</div></div>' + btn + '</div>';
   }
   var listHtml = '';
   TASK_GROUPS.forEach(function (g) {
@@ -956,10 +1409,11 @@ function renderHome() {
     listHtml += '<div class="grp-title">' + g.label +
       (g.tag ? '<span class="grp-tag">' + g.tag + '</span>' : '') + '</div>' + items.map(rowHtml).join('');
   });
-  var orphan = S.config.tasks.filter(function (t) { return !t.group && t.enabled; });
-  if (orphan.length) listHtml += orphan.map(rowHtml).join('');
   $('taskList').innerHTML = listHtml;
   $('bwHint').style.display = inBirthdayWeek() ? '' : 'none';
+  $('bwHint').textContent = buffActive()
+    ? '⚡ 双倍卡生效中 ×2 ｜ 生日周与双倍卡不叠加（同为×2）'
+    : '🎂 生日周双倍进行中 ×2.0';
   document.querySelectorAll('#taskList [data-ck]').forEach(function (b) {
     b.addEventListener('click', function () { doCheckin(findTask(b.dataset.ck)); });
   });
@@ -973,94 +1427,200 @@ function renderHome() {
   }).join('') || '<div class="empty">还没有动态</div>';
 }
 
-function renderTier() {
-  var t = curTier(), nt = nextTierOf();
-  $('tierHello').textContent = S.child.name + ' 的英雄段位';
-  $('tierName').textContent = t.name;
-  $('tierName').style.color = TIER_COLOR[t.short] || 'var(--gold)';
-  $('tierTitle').textContent = '称号：' + TIER_TITLE[t.short];
-  var stars = '';
-  for (var i = 0; i < STARS_PER; i++) stars += '<span class="' + (i < t.stars ? '' : 'off') + '">⭐</span>';
-  $('tierStars').innerHTML = stars;
-  $('tierPoints').textContent = S.child.points;
-  $('tierBonus').textContent = '×' + t.bonus.toFixed(2);
-  $('tierStreak').textContent = streakDays();
-  if (nt) {
-    var span = nt.threshold - t.threshold;
-    var pct = Math.max(2, Math.round((S.child.points - t.threshold) / span * 100));
-    $('tierNext').textContent = '距 ' + nt.name + ' 还差 ' + (nt.threshold - S.child.points) + ' 分';
-    $('tierBar').style.width = pct + '%';
-  } else {
-    $('tierNext').textContent = '已达最高段位 👑';
-    $('tierBar').style.width = '100%';
+function renderChart() {
+  var cv = $('weekChart');
+  if (!cv) return;
+  var dpr = window.devicePixelRatio || 1;
+  var w = cv.clientWidth || cv.parentElement.clientWidth;
+  var h = 150;
+  cv.width = w * dpr; cv.height = h * dpr;
+  var ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+  var monday = new Date(); monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+  var days = [], data = [];
+  for (var i = 0; i < 7; i++) {
+    var dd = new Date(monday); dd.setDate(monday.getDate() + i);
+    var ds = dd.getFullYear() + '-' + String(dd.getMonth()+1).padStart(2,'0') + '-' + String(dd.getDate()).padStart(2,'0');
+    var sum = 0;
+    S.child.transactions.forEach(function (t) { if (t.date === ds && t.amount > 0) sum += t.amount; });
+    days.push(['周一','周二','周三','周四','周五','周六','周日'][i]); data.push(sum);
   }
-  var ci = tierIdx(S.child.points);
-  $('tierMap').innerHTML = S.config.tiers.map(function (tt, i) {
+  var max = Math.max(20, Math.max.apply(null, data));
+  var padL = 8, padR = 8, padT = 20, padB = 24;
+  var cw = (w - padL - padR) / 7, chartH = h - padT - padB;
+  ctx.strokeStyle = 'rgba(205,127,50,.25)';
+  ctx.beginPath(); ctx.moveTo(padL, padT + chartH + .5); ctx.lineTo(w - padR, padT + chartH + .5); ctx.stroke();
+  var todayIdx = (new Date().getDay() + 6) % 7;
+  data.forEach(function (v, i) {
+    var bw = Math.min(24, cw * 0.5);
+    var x = padL + cw * i + (cw - bw) / 2;
+    var bh = v > 0 ? Math.max(6, v / max * chartH) : 2;
+    var y = padT + chartH - bh;
+    var g = ctx.createLinearGradient(0, y, 0, padT + chartH);
+    g.addColorStop(0, '#FFD700'); g.addColorStop(1, 'rgba(205,127,50,.35)');
+    ctx.fillStyle = v > 0 ? g : 'rgba(205,127,50,.18)';
+    ctx.beginPath(); ctx.roundRect(x, y, bw, bh, 4); ctx.fill();
+    if (v > 0) {
+      ctx.fillStyle = '#f5d78e'; ctx.font = "700 11px 'Noto Sans SC', sans-serif"; ctx.textAlign = 'center';
+      ctx.fillText('+' + v, x + bw / 2, y - 5);
+    }
+    ctx.fillStyle = i === todayIdx ? '#FFD700' : '#b89f85';
+    ctx.font = (i === todayIdx ? '700 ' : '') + "11px 'Noto Sans SC', sans-serif";
+    ctx.textAlign = 'center'; ctx.fillText(days[i], x + bw / 2, h - 8);
+  });
+}
+
+function renderTier() {
+  var info = curLevel(), nm = nextMilestone();
+  $('tierHello').textContent = S.child.name + ' 的英雄段位';
+  $('tierName').textContent = info.isKing ? info.name + ' ' + info.kingStars + '★' : info.name;
+  $('tierName').style.color = TIER_COLOR[info.short] || 'var(--gold)';
+  var eqT = S.child.equippedTitle ? TITLES.find(function (x) { return x.id === S.child.equippedTitle; }) : null;
+  $('tierTitle').textContent = eqT ? '👑 ' + eqT.name : '称号：' + TIER_TITLE[info.short];
+  if (info.isKing) {
+    var ks = '';
+    for (var j = 0; j < Math.min(5, info.kingStars); j++) ks += '⭐';
+    $('tierStars').innerHTML = ks + (info.kingStars > 5 ? '<span style="font-size:13px;color:var(--gold)"> ×' + info.kingStars + '</span>' : '') +
+      (info.kingStars >= S.config.king.gloryStar ? ' 👑👑' : (info.kingStars >= S.config.king.legendStar ? ' 👑' : ''));
+  } else {
+    var stars = '';
+    for (var i = 0; i < info.maxStars; i++) stars += '<span class="' + (i < info.stars ? '' : 'off') + '">⭐</span>';
+    $('tierStars').innerHTML = stars;
+  }
+  $('tierPoints').textContent = S.child.points;
+  $('tierBonus').textContent = '×' + (earnMultiplier()).toFixed(2) + (buffActive() || inBirthdayWeek() ? '（含双倍）' : '');
+  $('tierStreak').textContent = streakDays();
+  var pct = Math.max(2, Math.round((S.child.points - nm.threshold) / Math.max(1, nm.span) * 100));
+  $('tierNext').textContent = '距 ' + nm.name + ' 还差 ' + nm.pointsNeeded + ' 分';
+  $('tierBar').style.width = Math.min(100, pct) + '%';
+  var ci = info.idx;
+  var mapHtml = S.config.tiers.map(function (t, i) {
     var cls = i === ci ? 'now' : (i < ci ? 'past' : '');
-    return '<div class="tier-cell ' + cls + '"><div class="tn" style="color:' + (TIER_COLOR[tt.short] || '') + '">' + tt.name + '</div>' +
-      '<div class="tp">' + tt.threshold + ' 分 · ×' + tt.bonus.toFixed(2) + '</div></div>';
+    return '<div class="tier-cell ' + cls + '"><div class="tn" style="color:' + (TIER_COLOR[t.short] || '') + '">' + t.name + '</div>' +
+      '<div class="tp">' + t.threshold + ' 分 · ' + t.stars + '星 · ×' + t.bonus.toFixed(2) + '</div></div>';
   }).join('');
-  $('tierHist').innerHTML = S.child.tierHistory.length ? S.child.tierHistory.map(function (h) {
-    return '<div class="hist-item"><div class="l1">' + esc(h.from) + ' → ' + esc(h.to) +
-      (h.grand ? '<span class="tag">大段位升</span>' : '<span class="tag" style="background:rgba(205,127,50,.3);color:var(--gold-soft)">小段位升</span>') + '</div>' +
-      '<div class="l2">' + fmtDate(h.date) + (h.note ? ' · ' + esc(h.note) : '') + '</div></div>';
+  var k = S.config.king;
+  mapHtml += '<div class="tier-cell king ' + (info.isKing ? 'now' : '') + '"><div class="tn" style="color:' + TIER_COLOR['王者'] + '">👑 ' + TIER_FULL['王者'] + '</div>' +
+    '<div class="tp">' + k.entry + ' 分进入 · 每 ' + k.perStar + ' 分=1星 · ' + k.legendStar + '★传奇 / ' + k.gloryStar + '★荣耀 · ×' + k.bonus.toFixed(2) + '</div></div>';
+  $('tierMap').innerHTML = mapHtml;
+  $('tierHist').innerHTML = S.child.tierHistory.length ? S.child.tierHistory.slice(0, 20).map(function (hh) {
+    return '<div class="hist-item"><div class="l1">' + esc(hh.from) + ' → ' + esc(hh.to) +
+      (hh.grand ? '<span class="tag">大段位升</span>' : '<span class="tag" style="background:rgba(205,127,50,.3);color:var(--gold-soft)">小段位升</span>') + '</div>' +
+      '<div class="l2">' + fmtDate(hh.date) + (hh.note ? ' · ' + esc(hh.note) : '') + '</div></div>';
   }).join('') : '<div class="empty">还没有升级记录</div>';
 }
 
 function renderBag() {
+  /* 道具栏 */
+  var hasItem = false, itemHtml = '';
+  ['dbDay','dbWeek','game1','game3','freeDay'].forEach(function (k) {
+    var n = S.child.items[k] || 0;
+    if (n <= 0) return;
+    hasItem = true;
+    var m = ITEM_META[k];
+    var btnHtml = '';
+    if (k === 'dbDay' || k === 'dbWeek') {
+      btnHtml = buffActive()
+        ? '<div class="ck-wait" style="min-height:44px">生效中</div>'
+        : '<button class="ck-btn" data-buff="' + k + '">激活</button>';
+    } else {
+      btnHtml = '<button class="ck-btn" data-coupon="' + k + '">使用</button>';
+    }
+    itemHtml += '<div class="item-row"><div class="box-ico">' + m.icon + '</div>' +
+      '<div class="box-info"><div class="n">' + m.name + ' <span class="cnt">×' + n + '</span></div>' +
+      '<div class="m">' + (k === 'dbDay' ? '激活当天任务积分×2' : k === 'dbWeek' ? '激活后7天任务积分×2' : '使用需家长确认核销') + '</div></div>' + btnHtml + '</div>';
+  });
+  $('itemList').innerHTML = hasItem ? itemHtml :
+    '<div class="empty">还没有道具<br>开盲盒有几率获得双倍卡、游戏时间券、自由安排日 🎁</div>';
+  document.querySelectorAll('#itemList [data-buff]').forEach(function (b) {
+    b.addEventListener('click', function () { activateBuff(b.dataset.buff); });
+  });
+  document.querySelectorAll('#itemList [data-coupon]').forEach(function (b) {
+    b.addEventListener('click', function () { useCoupon(b.dataset.coupon); });
+  });
+
+  /* 盲盒 */
+  var pity = S.config.system.pity || 10;
+  $('pityNote').textContent = S.child.pityCount > 0 ? '距保底还差 ' + (pity - S.child.pityCount) + ' 盒' : '保底：累计 ' + pity + ' 盒必出道具';
   $('boxList').innerHTML = S.child.blindboxes.length ? S.child.blindboxes.map(function (b) {
-    return '<div class="box-row"><div class="box-ico">' + (b.kind === 'grand' ? '🏆' : '🎁') + '</div>' +
-      '<div class="box-info"><div class="n">' + (b.kind === 'grand' ? '高级盲盒' : '普通盲盒') + '</div>' +
-      '<div class="m">可开出 ' + b.range[0] + ' ~ ' + b.range[1] + ' 积分</div></div>' +
+    var km = BOX_KIND_META[b.kind];
+    return '<div class="box-row"><div class="box-ico">' + km.icon + '</div>' +
+      '<div class="box-info"><div class="n">' + km.name + '</div>' +
+      '<div class="m">积分 ' + km.range[0] + '~' + km.range[1] + ' 或稀有道具</div></div>' +
       '<button class="ck-btn" data-open="' + b.id + '">开盒</button></div>';
-  }).join('') : '<div class="empty">还没有盲盒哦<br>快去完成任务升级吧，升级就能获得盲盒！</div>';
+  }).join('') : '<div class="empty">还没有盲盒哦<br>升级就能获得盲盒：小段升=普通盒 · 跨大段=高级盒</div>';
   document.querySelectorAll('#boxList [data-open]').forEach(function (b) {
     b.addEventListener('click', function () { openBox(b.dataset.open); });
   });
-  $('boxHist').innerHTML = S.child.openedBoxes.length ? S.child.openedBoxes.slice(0, 10).map(function (b) {
+  var pn = BOX_POOLS.normal, pg = BOX_POOLS.grand;
+  var sum = function (pool) { var t = 0; pool.forEach(function (e) { t += e.w; }); return t; };
+  $('probNote').innerHTML = '🎁 普通盒：' + pn.map(function (e) { return ITEM_META[e.item].name + ' ' + Math.round(e.w / sum(pn) * 100) + '%'; }).join(' · ') +
+    '<br>🏆 高级盒：' + pg.map(function (e) { return ITEM_META[e.item].name + ' ' + Math.round(e.w / sum(pg) * 100) + '%'; }).join(' · ') +
+    '<br>稀有度：积分 ＞ 天卡 ＞ 周卡 ＞ 游戏1h ＞ 游戏3h ＞ 自由日';
+
+  $('boxHist').innerHTML = S.child.openedBoxes.length ? S.child.openedBoxes.slice(0, 12).map(function (b) {
+    var m = ITEM_META[b.item] || ITEM_META.points;
     return '<div class="tx-item"><div class="tx-top"><span class="tx-date">' + fmtDate(b.ts.slice(0, 10)) + '</span>' +
-      '<span class="tx-type">' + (b.kind === 'grand' ? '高级盲盒' : '普通盲盒') + '</span>' +
-      '<span class="tx-amt">+' + b.got + '</span></div></div>';
+      '<span class="tx-type">' + BOX_KIND_META[b.kind].name + '</span>' +
+      '<span class="tx-amt">' + (b.item === 'points' ? '+' + b.got : m.icon + ' ' + m.name) + '</span></div></div>';
   }).join('') : '<div class="empty">还没有开盒记录</div>';
 }
 
 function renderMe() {
-  var t = curTier();
+  var info = curLevel();
   $('meAvatar').textContent = S.child.name.slice(-1) || '明';
   $('meName').textContent = S.child.name;
-  $('meSub').textContent = t.name + ' · ' + TIER_TITLE[t.short] + ' · ' + S.child.points + ' 分';
-  var ci = tierIdx(S.child.points);
-  $('msList').innerHTML = S.config.milestones.length ? S.config.milestones.map(function (m, i) {
+  var eqT = S.child.equippedTitle ? TITLES.find(function (x) { return x.id === S.child.equippedTitle; }) : null;
+  $('meSub').textContent = (info.isKing ? info.name + ' ' + info.kingStars + '★' : info.name) + ' · ' +
+    (eqT ? eqT.name : TIER_TITLE[info.short]) + ' · ' + S.child.points + ' 分';
+
+  $('titleGrid').innerHTML = TITLES.map(function (t) {
+    var own = S.child.titlesOwned.indexOf(t.id) >= 0;
+    var eq = S.child.equippedTitle === t.id;
+    return '<div class="title-cell ' + (eq ? 'eq' : (own ? 'own' : '')) + '" data-title="' + t.id + '">' +
+      '<div class="tn">' + t.name + '</div><div class="th">' + (eq ? '✓ 佩戴中' : (own ? '点击佩戴' : '🔒 ' + t.how)) + '</div></div>';
+  }).join('');
+  document.querySelectorAll('#titleGrid [data-title]').forEach(function (c) {
+    c.addEventListener('click', function () {
+      var tid = c.dataset.title;
+      if (S.child.titlesOwned.indexOf(tid) < 0) { toast('还未获得该称号'); return; }
+      S.child.equippedTitle = S.child.equippedTitle === tid ? null : tid;
+      save(); renderAll();
+    });
+  });
+
+  var ci = info.idx;
+  $('msList').innerHTML = S.config.milestones.length ? S.config.milestones.map(function (m) {
     var mi = tierIndexOfShort(m.tier);
-    var reached = ci >= mi;
+    var reached = (m.tier === '王者') ? S.child.points >= S.config.king.entry : ci >= mi;
     var cls = m.granted ? 'done' : (reached ? 'reach' : '');
     return '<div class="ms-card ' + cls + '"><div class="ms-top"><span class="ms-tier">' + esc(m.tier) + '</span>' +
       '<span class="ms-name">' + esc(m.name) + '</span>' +
-      '<span class="ms-st">' + (m.granted ? '✅ 已发放' : (reached ? '🌟 已达成' : '🔒 升到' + esc(m.tier) + '解锁')) + '</span></div>' +
+      '<span class="ms-st">' + (m.granted ? '✅ 已发放' : (reached ? '🌟 已达成' : '🔒 升到' + esc(TIER_FULL[m.tier] || m.tier) + '解锁')) + '</span></div>' +
       '<div class="ms-desc">' + esc(m.desc) + '</div></div>';
   }).join('') : '<div class="empty">还没有设置愿望，找爸妈加一个吧</div>';
 
-  var achv = [
-    { icon:'✅', name:'首次打卡', got: Object.keys(S.child.checkins).length > 0 },
-    { icon:'🔥', name:'连续全勤7天', got: streakDays() >= 7 },
-    { icon:'🎖️', name:'首次升段', got: S.child.tierHistory.length > 1 },
-    { icon:'🎁', name:'首个盲盒', got: S.child.openedBoxes.length > 0 },
-    { icon:'💰', name:'首次兑换', got: S.child.redeemRecords.length > 0 },
-    { icon:'🌟', name:'愿望成真', got: S.config.milestones.some(function (m) { return m.granted; }) }
-  ];
-  $('achvGrid').innerHTML = achv.map(function (a) {
-    return '<div class="achv' + (a.got ? ' got' : '') + '"><div class="ico">' + a.icon + '</div>' +
-      '<div class="nm">' + a.name + '</div><div class="st">' + (a.got ? '已达成' : '未解锁') + '</div></div>';
+  checkAchievements();
+  var doneN = S.child.achievementsDone.length;
+  $('achvCount').textContent = doneN + '/' + ACHIEVEMENTS.length;
+  $('achvGrid').innerHTML = ACHIEVEMENTS.map(function (a) {
+    var got = S.child.achievementsDone.indexOf(a.id) >= 0;
+    return '<div class="achv' + (got ? ' got' : '') + '">' +
+      (a.top ? '<span class="topmark">🎖️</span>' : '') +
+      '<div class="ico">' + a.icon + '</div>' +
+      '<div class="nm">' + a.name + '</div><div class="st">' + (got ? '已达成' : a.desc) + '</div></div>';
   }).join('');
   $('dataNote').textContent = '数据保存在本机浏览器 · 最近更新 ' + (S.updatedAt || '').slice(0, 16).replace('T', ' ') + ' · 记得定期导出备份';
 }
 
-function renderAll() { renderHeader(); renderHome(); renderTier(); renderBag(); renderMe(); }
+function renderAll() { renderHeader(); renderHome(); renderChart(); renderTier(); renderBag(); renderMe(); }
 
 /* ================= Tab 切换 ================= */
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(function (s) { s.classList.toggle('on', s.id === 'tab-' + name); });
   document.querySelectorAll('.tabbar button').forEach(function (b) { b.classList.toggle('on', b.dataset.tab === name); });
+  if (name === 'home') requestAnimationFrame(renderChart);
 }
 $('tabbar').addEventListener('click', function (e) {
   var b = e.target.closest('button[data-tab]');
@@ -1089,6 +1649,7 @@ $('pbConfirm').addEventListener('click', function () { switchTab('home'); window
 $('pbRedeem').addEventListener('click', openRedeemSheet);
 $('pbAdmin').addEventListener('click', openAdminSheet);
 $('pbData').addEventListener('click', openDataSheet);
+$('backupStrip').addEventListener('click', openDataSheet);
 $('pbExit').addEventListener('click', function () {
   sessionStorage.removeItem('hero_parent'); renderAll(); toast('已退出家长模式');
 });
@@ -1097,12 +1658,20 @@ $('pbExit').addEventListener('click', function () {
 load();
 renderAll();
 checkBirthday();
+checkAchievements();
+var resizeTimer = null;
+window.addEventListener('resize', function () {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(renderChart, 150);
+});
 /* 测试钩子：仅供自动化验收与排查用 */
 window.__hero = {
   get state() { return S; },
   save: save, load: load, seed: seed,
   addPoints: addPoints, confirmPending: confirmPending, openBox: openBox,
-  tierIdx: tierIdx, curTier: curTier, streakDays: streakDays
+  doCheckin: doCheckin, activateBuff: activateBuff, useCoupon: useCoupon,
+  levelInfo: levelInfo, streakDays: streakDays, checkAchievements: checkAchievements,
+  grantBox: grantBox, weightedPick: weightedPick
 };
 </script>
 </body>
