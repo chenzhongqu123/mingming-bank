@@ -890,49 +890,167 @@ body {
 <script>
 // ===== DATA =====
 const bankData = {
-  name: "陈明哲",
-  birthday: "07-20",
-  growthPoints: 100,
-  pocketPoints: 100,
-  tier: { name: "🥉倔强青铜Ⅲ", short: "青铜", stars: 0, maxStars: 3 },
-  nextTier: { name: "🥉青铜Ⅲ⭐", pointsNeeded: 200 },
-  progress: 33,
-  todayRecords: [
-    { desc: "做家务（扫地）", points: 10, status: "confirmed" },
-    { desc: "准时完成作业（试卷1）", points: 20, status: "confirmed" },
-    { desc: "准时完成作业（试卷2）", points: 20, status: "confirmed" },
+  "name": "陈明哲",
+  "birthday": "07-20",
+  "growthPoints": 620,
+  "pocketPoints": 620,
+  "tier": {
+    "name": "🥉倔强青铜Ⅲ⭐⭐",
+    "short": "青铜",
+    "stars": 2,
+    "maxStars": 3
+  },
+  "nextTier": {
+    "name": "🥉倔强青铜Ⅱ",
+    "pointsNeeded": 280
+  },
+  "progress": 7,
+  "todayRecords": [],
+  "weeklyData": [
+    {
+      "day": "周一",
+      "points": 0
+    },
+    {
+      "day": "周二",
+      "points": 0
+    },
+    {
+      "day": "周三",
+      "points": 0
+    },
+    {
+      "day": "周四",
+      "points": 0
+    },
+    {
+      "day": "周五",
+      "points": 0
+    },
+    {
+      "day": "周六",
+      "points": 0
+    },
+    {
+      "day": "周日",
+      "points": 0
+    }
   ],
-  weeklyData: [
-    { day: "周一", points: 0 },
-    { day: "周二", points: 0 },
-    { day: "周三", points: 0 },
-    { day: "周四", points: 0 },
-    { day: "周五", points: 0 },
-    { day: "周六", points: 50 },
-    { day: "周日", points: 0 },
+  "pendingBlindBoxes": 0,
+  "achievements": [
+    {
+      "name": "周全勤",
+      "unlocked": false,
+      "icon": "🏅"
+    },
+    {
+      "name": "月全勤",
+      "unlocked": false,
+      "icon": "🏅"
+    },
+    {
+      "name": "年全勤",
+      "unlocked": false,
+      "icon": "🏆"
+    },
+    {
+      "name": "首个盲盒",
+      "unlocked": false,
+      "icon": "🎁"
+    },
+    {
+      "name": "首次升级",
+      "unlocked": true,
+      "icon": "⭐"
+    }
   ],
-  pendingBlindBoxes: 0,
-  achievements: [
-    { name: "周全勤", unlocked: false, icon: "🏅" },
-    { name: "月全勤", unlocked: false, icon: "🏅" },
-    { name: "年全勤", unlocked: false, icon: "🏆" },
-    { name: "首个盲盒", unlocked: false, icon: "🎁" },
-    { name: "首次升级", unlocked: false, icon: "⭐" },
+  "exchangeItems": [
+    {
+      "name": "多看手机10分钟",
+      "points": 50,
+      "yuan": 5
+    },
+    {
+      "name": "选今晚想吃的菜",
+      "points": 100,
+      "yuan": 10
+    },
+    {
+      "name": "周末多玩30分钟游戏",
+      "points": 150,
+      "yuan": 15
+    },
+    {
+      "name": "免一次家务",
+      "points": 200,
+      "yuan": 20
+    },
+    {
+      "name": "买书/漫画",
+      "points": 250,
+      "yuan": 25
+    },
+    {
+      "name": "选周末出去玩",
+      "points": 300,
+      "yuan": 30
+    },
+    {
+      "name": "买50元内玩具",
+      "points": 500,
+      "yuan": 50
+    },
+    {
+      "name": "取现金",
+      "points": 100,
+      "yuan": 10,
+      "note": "100分起"
+    }
   ],
-  exchangeItems: [
-    { name: "多看手机10分钟", points: 50, yuan: 5 },
-    { name: "选今晚想吃的菜", points: 100, yuan: 10 },
-    { name: "周末多玩30分钟游戏", points: 150, yuan: 15 },
-    { name: "免一次家务", points: 200, yuan: 20 },
-    { name: "买书/漫画", points: 250, yuan: 25 },
-    { name: "选周末出去玩", points: 300, yuan: 30 },
-    { name: "买50元内玩具", points: 500, yuan: 50 },
-    { name: "取现金", points: 100, yuan: 10, note: "100分起" },
-  ],
-  transactions: [
-    { date: "2026-07-12", type: "工资", amount: 50, desc: "做家务+作业×2" },
-    { date: "2026-07-12", type: "开户", amount: 50, desc: "开户礼包" },
-  ],
+  "transactions": [
+    {
+      "date": "2026-08-29",
+      "type": "重启礼",
+      "amount": 200,
+      "desc": "银行重启礼（系统重启，行长发放；7/18~8/29 空档不逐日补录）"
+    },
+    {
+      "date": "2026-07-16",
+      "type": "日常基础任务",
+      "amount": 80,
+      "desc": "日常基础任务（成长积分+80，零花钱积分+80）〔2026-08-29 按 PR"
+    },
+    {
+      "date": "2026-07-15",
+      "type": "日常基础任务",
+      "amount": 80,
+      "desc": "日常基础任务（成长积分+80，零花钱积分+80）〔2026-08-29 按 PR"
+    },
+    {
+      "date": "2026-07-14",
+      "type": "日常基础任务",
+      "amount": 80,
+      "desc": "日常基础任务（成长积分+80，零花钱积分+80）〔2026-08-29 按 PR"
+    },
+    {
+      "date": "2026-07-13",
+      "type": "日常基础任务",
+      "amount": 80,
+      "desc": "日常基础任务（成长积分+80，零花钱积分+80）〔2026-08-29 按 PR"
+    },
+    {
+      "date": "2026-07-12",
+      "type": "工资",
+      "amount": 50,
+      "desc": "工资2026-07-12"
+    },
+    {
+      "date": "2026-07-12",
+      "type": "开户礼包",
+      "amount": 50,
+      "desc": "开户奖励金（成长积分+50，零花钱积分+50）"
+    }
+  ]
 };
 
 // ===== RENDER FUNCTIONS =====

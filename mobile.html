@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🏦%3C/text%3E%3C/svg%3E">
+<title>🏦 明哲成长银行 · 手机版</title>
+<script>
+(function(){
+  try{
+    if(localStorage.getItem('site_auth')==='ok')return;
+    var ok=false;
+    for(var i=0;i<3;i++){
+      var p=prompt('🏦 明哲成长银行
+请输入访问密码')||'';
+      if(p==='720720'){ok=true;break;}
+    }
+    if(!ok){
+      document.documentElement.innerHTML='<body style="background:#0a0502;color:#b89f85;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0"><div style="text-align:center;font-size:16px;line-height:2">🔒 密码不对<br>本页面已锁定</div></body>';
+      throw new Error('locked');
+    }
+    localStorage.setItem('site_auth','ok');
+  }catch(e){}
+})();
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap');
+
+:root {
+  --bg: #0a0502;
+  --panel: rgba(45, 24, 16, 0.65);
+  --panel-solid: #1d120c;
+  --bronze: #CD7F32;
+  --gold: #FFD700;
+  --gold-soft: #f5d78e;
+  --text: #f5e6d0;
+  --text-dim: #b89f85;
+  --red: #ff7b6b;
+  --line: rgba(205, 127, 50, 0.25);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body { background: var(--bg); }
+
+body {
+  font-family: 'Noto Sans SC', '微软雅黑', 'PingFang SC', sans-serif;
+  color: var(--text);
+  min-height: 100dvh;
+  background:
+    radial-gradient(1200px 500px at 50% -10%, rgba(205,127,50,.14), transparent 60%),
+    radial-gradient(800px 400px at 90% 110%, rgba(120,60,20,.10), transparent 60%),
+    var(--bg);
+}
+
+#app {
+  max-width: 520px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: calc(72px + env(safe-area-inset-bottom));
+}
+
+/* 桌面预览时给个手机框观感 */
+@media (min-width: 560px) {
+  #app {
+    border-left: 1px solid var(--line);
+    border-right: 1px solid var(--line);
+    box-shadow: 0 0 60px rgba(0,0,0,.6);
+  }
+}
+
+/* ===== 顶栏 ===== */
+.mhead {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: calc(10px + env(safe-area-inset-top)) 16px 10px;
+  background: rgba(15, 8, 4, 0.86);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+.mhead-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.logo {
+  width: 40px; height: 40px; flex: none;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #3a2213, #241108);
+  border: 1px solid rgba(205,127,50,.45);
+  box-shadow: inset 0 1px 0 rgba(255,215,0,.18);
+}
+.bank-name { font-size: 16px; font-weight: 900; letter-spacing: .5px; }
+.saver { font-size: 12px; color: var(--text-dim); margin-top: 1px; }
+.mhead-right { text-align: right; flex: none; }
+.tier-chip {
+  display: inline-block;
+  font-size: 12px; font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  color: var(--gold-soft);
+  background: rgba(205,127,50,.16);
+  border: 1px solid rgba(205,127,50,.5);
+  white-space: nowrap;
+}
+.mdate { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+
+/* ===== 主体 ===== */
+main { flex: 1; padding: 14px 14px 20px; }
+.tab { display: none; animation: fadein .25s ease; }
+.tab.on { display: block; }
+@keyframes fadein { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 14px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.card-title {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 14px; font-weight: 700; color: var(--gold-soft);
+  margin-bottom: 12px;
+}
+.card-title .sub { margin-left: auto; font-size: 11px; font-weight: 400; color: var(--text-dim); }
+
+/* ===== 首页·段位英雄卡 ===== */
+.hero {
+  position: relative;
+  text-align: center;
+  padding: 22px 16px 18px;
+  overflow: hidden;
+  border: 1px solid rgba(205,127,50,.55);
+  box-shadow: 0 0 24px rgba(205,127,50,.18), inset 0 1px 0 rgba(255,215,0,.15);
+  animation: heroGlow 3.2s ease-in-out infinite;
+}
+@keyframes heroGlow {
+  0%, 100% { box-shadow: 0 0 18px rgba(205,127,50,.14), inset 0 1px 0 rgba(255,215,0,.15); }
+  50%      { box-shadow: 0 0 34px rgba(255,215,0,.22),  inset 0 1px 0 rgba(255,215,0,.25); }
+}
+.avatar {
+  width: 64px; height: 64px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; font-weight: 900; color: #2a1503;
+  background: linear-gradient(145deg, #FFD700, #CD7F32 70%);
+  box-shadow: 0 0 0 3px rgba(10,5,2,.9), 0 0 0 5px rgba(205,127,50,.5), 0 4px 14px rgba(0,0,0,.5);
+}
+.hero .hello { font-size: 13px; color: var(--text-dim); }
+.hero .tier-name { font-size: 22px; font-weight: 900; color: var(--gold); margin: 2px 0 6px; text-shadow: 0 2px 10px rgba(255,215,0,.25); }
+.stars { font-size: 20px; letter-spacing: 4px; margin-bottom: 14px; }
+.stars .off { opacity: .22; filter: grayscale(1); }
+
+.dual { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.stat {
+  border-radius: 12px;
+  padding: 12px 8px;
+  background: rgba(10, 5, 2, 0.45);
+  border: 1px solid rgba(205,127,50,.22);
+}
+.stat .label { font-size: 12px; color: var(--text-dim); }
+.stat .num { font-size: 32px; font-weight: 900; color: var(--gold); line-height: 1.15; font-variant-numeric: tabular-nums; }
+.stat .num.pocket { color: #ffd9a0; }
+.stat .unit { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+.bar-wrap { text-align: left; }
+.bar-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-dim); margin-bottom: 6px; }
+.bar-label b { color: var(--gold-soft); font-weight: 700; }
+.bar {
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(10,5,2,.6);
+  border: 1px solid rgba(205,127,50,.35);
+  overflow: hidden;
+}
+.bar > i {
+  display: block; height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #CD7F32, #FFD700);
+  box-shadow: 0 0 10px rgba(255,215,0,.5);
+  transition: width .6s ease;
+}
+
+/* ===== 盲盒卡 ===== */
+.blind-row { display: flex; align-items: center; gap: 12px; }
+.blind-emoji { font-size: 34px; flex: none; }
+.blind-info { flex: 1; min-width: 0; }
+.blind-info .t { font-size: 15px; font-weight: 700; }
+.blind-info .s { font-size: 11px; color: var(--text-dim); margin-top: 3px; line-height: 1.5; }
+.btn-gold {
+  flex: none;
+  min-height: 44px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px; font-weight: 700;
+  color: #2a1503;
+  background: linear-gradient(145deg, #FFD700, #CD7F32);
+  box-shadow: 0 3px 10px rgba(205,127,50,.35);
+  cursor: pointer;
+}
+.btn-gold:active { transform: scale(.96); }
+
+/* ===== 今日动态 ===== */
+.today-list { list-style: none; }
+.today-list li {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(205,127,50,.18);
+  font-size: 14px;
+}
+.today-list li:last-child { border-bottom: none; }
+.today-list .dot { width: 8px; height: 8px; flex: none; border-radius: 50%; background: var(--gold); box-shadow: 0 0 6px rgba(255,215,0,.6); }
+.today-list .dot.pending { background: var(--text-dim); box-shadow: none; }
+.today-list .desc { flex: 1; min-width: 0; }
+.today-list .pts { font-weight: 700; color: var(--gold); font-variant-numeric: tabular-nums; }
+.empty {
+  padding: 18px 10px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-dim);
+  border: 1px dashed rgba(205,127,50,.25);
+  border-radius: 12px;
+  line-height: 1.7;
+}
+
+/* ===== 本周曲线 ===== */
+#weekChart { width: 100%; height: 170px; display: block; }
+
+/* ===== 流水 ===== */
+.tx-item {
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  background: rgba(10,5,2,.38);
+  border: 1px solid rgba(205,127,50,.18);
+}
+.tx-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.tx-date { font-size: 12px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+.tx-type {
+  font-size: 11px; font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+  color: var(--gold-soft);
+  background: rgba(205,127,50,.16);
+  border: 1px solid rgba(205,127,50,.4);
+  white-space: nowrap;
+  max-width: 55%;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.tx-type.neg { color: #ffb3a8; background: rgba(255,110,90,.12); border-color: rgba(255,110,90,.4); }
+.tx-amt {
+  margin-left: auto;
+  font-size: 17px; font-weight: 900;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.tx-amt.neg { color: var(--red); }
+.tx-desc { font-size: 12.5px; color: var(--text-dim); line-height: 1.6; word-break: break-all; }
+.tx-note {
+  margin-top: 10px;
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* ===== 商城 ===== */
+.ex-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 14px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  background: rgba(10,5,2,.38);
+  border: 1px solid rgba(205,127,50,.18);
+}
+.ex-info { flex: 1; min-width: 0; }
+.ex-info .n { font-size: 15px; font-weight: 700; }
+.ex-info .m { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+.ex-info .m b { color: var(--gold-soft); }
+.ex-btn {
+  flex: none;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(205,127,50,.5);
+  font-family: inherit;
+  font-size: 13px; font-weight: 700;
+  color: var(--gold-soft);
+  background: rgba(205,127,50,.14);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ex-btn.ok {
+  color: #2a1503;
+  background: linear-gradient(145deg, #FFD700, #CD7F32);
+  border: none;
+  box-shadow: 0 3px 10px rgba(205,127,50,.35);
+}
+.ex-btn:active { transform: scale(.96); }
+
+/* ===== 成就 ===== */
+.achv-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.achv {
+  text-align: center;
+  padding: 14px 6px 12px;
+  border-radius: 12px;
+  background: rgba(10,5,2,.38);
+  border: 1px solid rgba(205,127,50,.18);
+}
+.achv .ico { font-size: 30px; line-height: 1.2; }
+.achv .nm { font-size: 12px; margin-top: 6px; color: var(--text); }
+.achv .st { font-size: 10px; margin-top: 4px; color: var(--text-dim); }
+.achv.got { border-color: rgba(255,215,0,.5); box-shadow: 0 0 14px rgba(255,215,0,.12); }
+.achv.got .st { color: var(--gold); font-weight: 700; }
+.achv:not(.got) .ico { filter: grayscale(1); opacity: .4; }
+
+/* 段位之路 */
+.ladder { list-style: none; }
+.ladder li {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 4px;
+  border-bottom: 1px dashed rgba(205,127,50,.18);
+  font-size: 14px;
+}
+.ladder li:last-child { border-bottom: none; }
+.ladder .l-ico { font-size: 20px; width: 28px; text-align: center; flex: none; }
+.ladder .l-nm { font-weight: 700; }
+.ladder .l-per { margin-left: auto; font-size: 12px; color: var(--text-dim); white-space: nowrap; }
+.ladder .l-st {
+  flex: none;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--text-dim);
+}
+.ladder li.now {
+  background: linear-gradient(90deg, rgba(255,215,0,.10), transparent);
+  border-radius: 10px;
+  border-bottom: none; margin: 0 -10px; padding: 11px 14px;
+}
+.ladder li.now .l-st { color: #2a1503; background: linear-gradient(145deg,#FFD700,#CD7F32); border: none; font-weight: 700; }
+
+/* ===== 底部导航 ===== */
+.tabbar {
+  position: fixed;
+  left: 0; right: 0;
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+  background: rgba(15, 8, 4, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid var(--line);
+}
+.tabbar button {
+  flex: 1;
+  min-height: 48px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--text-dim);
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.tabbar button .t-ico { font-size: 20px; line-height: 1; transition: transform .15s ease; }
+.tabbar button.on { color: var(--gold); }
+.tabbar button.on .t-ico { transform: translateY(-1px) scale(1.12); text-shadow: 0 0 12px rgba(255,215,0,.6); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="mhead">
+    <div class="mhead-left">
+      <div class="logo">🏦</div>
+      <div>
+        <div class="bank-name">明哲成长银行</div>
+        <div class="saver" id="hName">储户：陈明哲</div>
+      </div>
+    </div>
+    <div class="mhead-right">
+      <div class="tier-chip" id="hTier">—</div>
+      <div class="mdate" id="hDate"></div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- Tab 1 首页 -->
+    <section id="tab-home" class="tab on">
+      <div class="card hero">
+        <div class="avatar">明</div>
+        <div class="hello" id="heroHello">今天也要加油哦</div>
+        <div class="tier-name" id="heroTier">—</div>
+        <div class="stars" id="heroStars"></div>
+        <div class="dual">
+          <div class="stat">
+            <div class="label">成长积分</div>
+            <div class="num" id="heroGrowth">0</div>
+            <div class="unit">升段位 · 永不清零</div>
+          </div>
+          <div class="stat">
+            <div class="label">零花钱积分</div>
+            <div class="num pocket" id="heroPocket">0</div>
+            <div class="unit">10 分 = 1 元</div>
+          </div>
+        </div>
+        <div class="bar-wrap">
+          <div class="bar-label"><span>升段进度</span><b id="heroNext">—</b></div>
+          <div class="bar"><i id="heroBar" style="width:0%"></i></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="blind-row">
+          <div class="blind-emoji">🎁</div>
+          <div class="blind-info">
+            <div class="t" id="blindCount">待开盲盒 0 个</div>
+            <div class="s">升星盒 0~20 分 · 升段盒 20~50 分 · 跨大段盒 50~200 分<br>生日周（7/17~7/23）奖励翻倍</div>
+          </div>
+          <button class="btn-gold" id="blindBtn">开盒</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⏰ 今日动态<span class="sub">满额 80 分/天</span></div>
+        <ul class="today-list" id="todayList"></ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📈 本周成长曲线<span class="sub">成长积分收入</span></div>
+        <canvas id="weekChart"></canvas>
+      </div>
+    </section>
+
+    <!-- Tab 2 流水 -->
+    <section id="tab-flow" class="tab">
+      <div class="card">
+        <div class="card-title">📒 最近流水<span class="sub" id="flowCount"></span></div>
+        <div id="txList"></div>
+        <div class="tx-note">仅展示最近 50 笔 · 完整账目找管家（ZCode）查</div>
+      </div>
+    </section>
+
+    <!-- Tab 3 商城 -->
+    <section id="tab-shop" class="tab">
+      <div class="card">
+        <div class="card-title">🛒 兑换商城<span class="sub">所有兑换须行长（爸爸）批准</span></div>
+        <div id="exList"></div>
+      </div>
+    </section>
+
+    <!-- Tab 4 成就 -->
+    <section id="tab-achv" class="tab">
+      <div class="card">
+        <div class="card-title">🏆 成就墙</div>
+        <div class="achv-grid" id="achvGrid"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">🚀 段位之路<span class="sub">攒成长积分往上冲</span></div>
+        <ul class="ladder" id="ladder"></ul>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="tabbar" id="tabbar">
+    <button data-tab="home" class="on"><span class="t-ico">🏰</span>首页</button>
+    <button data-tab="flow"><span class="t-ico">📒</span>流水</button>
+    <button data-tab="shop"><span class="t-ico">🛒</span>商城</button>
+    <button data-tab="achv"><span class="t-ico">🏆</span>成就</button>
+  </nav>
+
+</div>
+
+<script>
+const bankData = {
+  "name": "陈明哲",
+  "birthday": "07-20",
+  "growthPoints": 620,
+  "pocketPoints": 620,
+  "tier": {
+    "name": "🥉倔强青铜Ⅲ⭐⭐",
+    "short": "青铜",
+    "stars": 2,
+    "maxStars": 3
+  },
+  "nextTier": {
+    "name": "🥉倔强青铜Ⅱ",
+    "pointsNeeded": 280
+  },
+  "progress": 7,
+  "todayRecords": [],
+  "weeklyData": [
+    {
+      "day": "周一",
+      "points": 0
+    },
+    {
+      "day": "周二",
+      "points": 0
+    },
+    {
+      "day": "周三",
+      "points": 0
+    },
+    {
+      "day": "周四",
+      "points": 0
+    },
+    {
+      "day": "周五",
+      "points": 0
+    },
+    {
+      "day": "周六",
+      "points": 0
+    },
+    {
+      "day": "周日",
+      "points": 0
+    }
+  ],
+  "pendingBlindBoxes": 0,
+  "achievements": [
+    {
+      "name": "周全勤",
+      "unlocked": false,
+      "icon": "🏅"
+    },
+    {
+      "name": "月全勤",
+      "unlocked": false,
+      "icon": "🏅"
+    },
+    {
+      "name": "年全勤",
+      "unlocked": false,
+      "icon": "🏆"
+    },
+    {
+      "name": "首个盲盒",
+      "unlocked": false,
+      "icon": "🎁"
+    },
+    {
+      "name": "首次升级",
+      "unlocked": true,
+      "icon": "⭐"
+    }
+  ],
+  "exchangeItems": [
+    {
+      "name": "多看手机10分钟",
+      "points": 50,
+      "yuan": 5
+    },
+    {
+      "name": "选今晚想吃的菜",
+      "points": 100,
+      "yuan": 10
+    },
+    {
+      "name": "周末多玩30分钟游戏",
+      "points": 150,
+      "yuan": 15
+    },
+    {
+      "name": "免一次家务",
+      "points": 200,
+      "yuan": 20
+    },
+    {
+      "name": "买书/漫画",
+      "points": 250,
+      "yuan": 25
+    },
+    {
+      "name": "选周末出去玩",
+      "points": 300,
+      "yuan": 30
+    },
+    {
+      "name": "买50元内玩具",
+      "points": 500,
+      "yuan": 50
+    },
+    {
+      "name": "取现金",
+      "points": 100,
+      "yuan": 10,
+      "note": "100分起"
+    }
+  ],
+  "transactions": [
+    {
+      "date": "2026-08-29",
+      "type": "重启礼",
+      "amount": 200,
+      "desc": "银行重启礼（系统重启，行长发放；7/18~8/29 空档不逐日补录）"
+    },
+    {
+      "date": "2026-07-16",
+      "type": "日常基础任务",
+      "amount": 80,
+      "desc": "日常基础任务（成长积分+80，零花钱积分+80）〔2026-08-29 按 PR"
+    },
+    {
+      "date": "2026-07-15",
+      "type": "日常基础任务",
+      "amount": 80,
+      "desc": "日常基础任务（成长积分+80，零花钱积分+80）〔2026-08-29 按 PR"
+    },
+    {
+      "date": "2026-07-14",
+      "type": "日常基础任务",
+      "amount": 80,
+      "desc": "日常基础任务（成长积分+80，零花钱积分+80）〔2026-08-29 按 PR"
+    },
+    {
+      "date": "2026-07-13",
+      "type": "日常基础任务",
+      "amount": 80,
+      "desc": "日常基础任务（成长积分+80，零花钱积分+80）〔2026-08-29 按 PR"
+    },
+    {
+      "date": "2026-07-12",
+      "type": "工资",
+      "amount": 50,
+      "desc": "工资2026-07-12"
+    },
+    {
+      "date": "2026-07-12",
+      "type": "开户礼包",
+      "amount": 50,
+      "desc": "开户奖励金（成长积分+50，零花钱积分+50）"
+    }
+  ]
+};
+
+/* ---------- 渲染 ---------- */
+const D = bankData;
+const $ = (id) => document.getElementById(id);
+
+const TIER_LADDER = [
+  { short: "青铜", emoji: "🥉", per: "300分/星" },
+  { short: "白银", emoji: "🥈", per: "500分/星" },
+  { short: "黄金", emoji: "🥇", per: "600分/星" },
+  { short: "铂金", emoji: "💠", per: "800分/星" },
+  { short: "钻石", emoji: "💎", per: "1000分/星" },
+  { short: "星耀", emoji: "✨", per: "1200分/星" },
+  { short: "王者", emoji: "👑", per: "至高荣耀" }
+];
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+function renderHeader() {
+  $("hName").textContent = "储户：" + D.name;
+  $("hTier").textContent = D.tier.short + " · " + D.growthPoints + "分";
+  const wd = ["日", "一", "二", "三", "四", "五", "六"];
+  const n = new Date();
+  $("hDate").textContent = (n.getMonth() + 1) + "月" + n.getDate() + "日 周" + wd[n.getDay()];
+}
+
+function renderHero() {
+  $("heroTier").textContent = D.tier.name;
+  let stars = "";
+  for (let i = 0; i < D.tier.maxStars; i++) {
+    stars += '<span class="' + (i < D.tier.stars ? "" : "off") + '">⭐</span>';
+  }
+  $("heroStars").innerHTML = stars;
+  $("heroGrowth").textContent = D.growthPoints;
+  $("heroPocket").textContent = D.pocketPoints;
+  $("heroNext").textContent = "距 " + D.nextTier.name + " 还差 " + D.nextTier.pointsNeeded + " 分";
+  $("heroBar").style.width = Math.max(2, D.progress) + "%";
+}
+
+function renderBlindbox() {
+  $("blindCount").textContent = "待开盲盒 " + D.pendingBlindBoxes + " 个";
+}
+
+function renderToday() {
+  const ul = $("todayList");
+  if (!D.todayRecords || !D.todayRecords.length) {
+    ul.innerHTML = '<div class="empty">今天还没有记录<br>按时起床 · 整理房间 · 刷牙洗脸 · 准时作业…<br>每一项都在攒分！</div>';
+    return;
+  }
+  ul.innerHTML = D.todayRecords.map((r) =>
+    '<li><span class="dot ' + (r.status === "confirmed" ? "" : "pending") + '"></span>' +
+    '<span class="desc">' + esc(r.desc) + '</span>' +
+    '<span class="pts">+' + r.points + '</span></li>'
+  ).join("");
+}
+
+function renderChart() {
+  const cv = $("weekChart");
+  const dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth || cv.parentElement.clientWidth;
+  const h = 170;
+  cv.width = w * dpr; cv.height = h * dpr;
+  const ctx = cv.getContext("2d");
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+
+  const data = D.weeklyData;
+  const max = Math.max(20, ...data.map((d) => d.points));
+  const padL = 8, padR = 8, padT = 22, padB = 26;
+  const cw = (w - padL - padR) / data.length;
+  const chartH = h - padT - padB;
+
+  // 基线
+  ctx.strokeStyle = "rgba(205,127,50,.25)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(padL, padT + chartH + .5);
+  ctx.lineTo(w - padR, padT + chartH + .5);
+  ctx.stroke();
+
+  data.forEach((d, i) => {
+    const bw = Math.min(26, cw * 0.5);
+    const x = padL + cw * i + (cw - bw) / 2;
+    const bh = d.points > 0 ? Math.max(6, d.points / max * chartH) : 2;
+    const y = padT + chartH - bh;
+
+    const g = ctx.createLinearGradient(0, y, 0, padT + chartH);
+    g.addColorStop(0, "#FFD700");
+    g.addColorStop(1, "rgba(205,127,50,.35)");
+    ctx.fillStyle = d.points > 0 ? g : "rgba(205,127,50,.18)";
+    ctx.beginPath();
+    ctx.roundRect(x, y, bw, bh, 4);
+    ctx.fill();
+
+    if (d.points > 0) {
+      ctx.fillStyle = "#f5d78e";
+      ctx.font = "700 11px 'Noto Sans SC', sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText("+" + d.points, x + bw / 2, y - 6);
+    }
+    ctx.fillStyle = i === new Date().getDay() - 1 || (new Date().getDay() === 0 && i === 6) ? "#FFD700" : "#b89f85";
+    ctx.font = (i < 5 ? "" : "700 ") + "11px 'Noto Sans SC', sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText(d.day, x + bw / 2, h - 8);
+  });
+}
+
+function renderFlow() {
+  const box = $("txList");
+  const list = D.transactions || [];
+  $("flowCount").textContent = "共 " + list.length + " 笔";
+  if (!list.length) { box.innerHTML = '<div class="empty">还没有流水</div>'; return; }
+  box.innerHTML = list.map((t) => {
+    const neg = t.amount < 0;
+    const mmdd = (t.date || "").slice(5).replace("-", "/");
+    return '<div class="tx-item">' +
+      '<div class="tx-top"><span class="tx-date">' + esc(mmdd) + '</span>' +
+      '<span class="tx-type' + (neg ? " neg" : "") + '">' + esc(t.type) + '</span>' +
+      '<span class="tx-amt' + (neg ? " neg" : "") + '">' + (neg ? "" : "+") + t.amount + '</span></div>' +
+      '<div class="tx-desc">' + esc(t.desc || "") + '</div></div>';
+  }).join("");
+}
+
+function renderShop() {
+  $("exList").innerHTML = (D.exchangeItems || []).map((it) => {
+    const afford = D.growthPoints >= it.points;
+    const note = it.note ? "（" + esc(it.note) + "）" : "";
+    return '<div class="ex-item"><div class="ex-info">' +
+      '<div class="n">' + esc(it.name) + '</div>' +
+      '<div class="m"><b>' + it.points + ' 分</b> · 约 ' + it.yuan + ' 元' + note + '</div></div>' +
+      '<button class="ex-btn' + (afford ? " ok" : "") + '" data-name="' + esc(it.name) + '" data-pts="' + it.points + '">' +
+      (afford ? "兑换" : "还差" + (it.points - D.growthPoints) + "分") + '</button></div>';
+  }).join("");
+  document.getElementById("exList").addEventListener("click", (e) => {
+    const b = e.target.closest("button.ex-btn");
+    if (b) alert("「" + b.dataset.name + "」兑换（" + b.dataset.pts + " 分）\n请找行长（爸爸）审批，批准后由管家记账 🏦");
+  });
+}
+
+function renderAchv() {
+  $("achvGrid").innerHTML = (D.achievements || []).map((a) =>
+    '<div class="achv' + (a.unlocked ? " got" : "") + '">' +
+    '<div class="ico">' + a.icon + '</div>' +
+    '<div class="nm">' + esc(a.name) + '</div>' +
+    '<div class="st">' + (a.unlocked ? "已达成" : "未解锁") + '</div></div>'
+  ).join("");
+
+  const curIdx = TIER_LADDER.findIndex((t) => t.short === D.tier.short);
+  $("ladder").innerHTML = TIER_LADDER.map((t, i) => {
+    const st = i < curIdx ? "已过关" : (i === curIdx ? "当前段位" : "待挑战");
+    return '<li class="' + (i === curIdx ? "now" : "") + '">' +
+      '<span class="l-ico">' + t.emoji + '</span>' +
+      '<span class="l-nm">' + t.short + '</span>' +
+      '<span class="l-per">' + t.per + '</span>' +
+      '<span class="l-st">' + st + '</span></li>';
+  }).join("");
+}
+
+/* ---------- Tab 切换 ---------- */
+function switchTab(name) {
+  document.querySelectorAll(".tab").forEach((s) => s.classList.toggle("on", s.id === "tab-" + name));
+  document.querySelectorAll(".tabbar button").forEach((b) => b.classList.toggle("on", b.dataset.tab === name));
+  if (name === "home") requestAnimationFrame(renderChart);
+}
+document.getElementById("tabbar").addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-tab]");
+  if (b) { location.hash = b.dataset.tab; }
+});
+window.addEventListener("hashchange", () => {
+  const t = (location.hash || "#home").slice(1);
+  switchTab(["home", "flow", "shop", "achv"].includes(t) ? t : "home");
+});
+
+$("blindBtn").addEventListener("click", () => {
+  if (D.pendingBlindBoxes > 0) alert("有 " + D.pendingBlindBoxes + " 个盲盒待开！\n喊行长（爸爸）见证，由管家开奖 🎁");
+  else alert("暂时没有待开的盲盒\n升星 / 升段 / 跨大段成功时会发盲盒哦 🎁");
+});
+
+let resizeTimer = null;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(renderChart, 150);
+});
+
+renderHeader();
+renderHero();
+renderBlindbox();
+renderToday();
+renderChart();
+renderFlow();
+renderShop();
+renderAchv();
+switchTab((location.hash || "#home").slice(1));
+</script>
+</body>
+</html>
