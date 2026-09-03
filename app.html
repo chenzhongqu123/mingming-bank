@@ -300,6 +300,29 @@ textarea.f-input { min-height:90px; resize:vertical; }
   padding:10px 18px; border-radius:999px; z-index:95; opacity:0; transition:opacity .25s; pointer-events:none; max-width:88vw; text-align:center; }
 .toast.on { opacity:1; }
 .small-note { font-size:11px; color:var(--dim); text-align:center; line-height:1.7; margin-top:8px; }
+
+/* ===== 登录页 ===== */
+#loginView { display:none; position:fixed; inset:0; z-index:70;
+  background: radial-gradient(800px 400px at 50% -10%, rgba(205,127,50,.18), transparent 60%), var(--bg);
+  flex-direction:column; align-items:center; justify-content:center;
+  padding:30px 24px calc(30px + env(safe-area-inset-bottom)); }
+#loginView.on { display:flex; }
+.lg-logo { font-size:64px; animation:popIn .5s cubic-bezier(.2,1.6,.4,1); }
+.lg-title { font-size:24px; font-weight:900; color:var(--gold); margin-top:10px; letter-spacing:1px; }
+.lg-sub { font-size:13px; color:var(--dim); margin:8px 0 28px; }
+.lg-users { display:flex; gap:14px; }
+.lg-user { width:94px; padding:16px 6px 14px; border-radius:16px; background:var(--panel);
+  border:1px solid var(--line); cursor:pointer; font-family:inherit; color:var(--text);
+  display:flex; flex-direction:column; align-items:center; gap:8px; }
+.lg-user .e { font-size:38px; line-height:1.1; }
+.lg-user .n { font-size:14px; font-weight:700; }
+.lg-user:active { transform:scale(.95); border-color:var(--gold); }
+.lg-pin { margin-top:26px; width:100%; max-width:300px; text-align:center; }
+.lg-pin .who { font-size:14px; color:var(--gold-soft); margin-bottom:10px; font-weight:700; }
+.lg-pin input { width:100%; min-height:48px; border-radius:12px; border:1px solid rgba(205,127,50,.45);
+  background:rgba(10,5,2,.5); color:var(--text); font-family:inherit; font-size:20px;
+  text-align:center; letter-spacing:8px; }
+.lg-pin input:focus { outline:none; border-color:var(--gold); }
 </style>
 </head>
 <body>
@@ -316,7 +339,7 @@ textarea.f-input { min-height:90px; resize:vertical; }
     <div class="mhead-right">
       <div class="tier-chip" id="hTier">—</div>
       <div class="mdate" id="hDate"></div>
-      <button class="parent-btn" id="parentBtn">家长入口</button>
+      <button class="parent-btn" id="roleBtn">未登录</button>
     </div>
   </header>
 
@@ -431,6 +454,18 @@ textarea.f-input { min-height:90px; resize:vertical; }
 </div>
 
 <div id="mask"><div class="sheet" id="sheet"></div></div>
+<div id="loginView">
+  <div class="lg-logo">🦸</div>
+  <div class="lg-title">成长小英雄</div>
+  <div class="lg-sub">谁在使用？请选择登录</div>
+  <div class="lg-users" id="lgUsers"></div>
+  <div class="lg-pin" id="lgPinBox" style="display:none">
+    <div class="who" id="lgWho"></div>
+    <input id="lgPin" type="password" inputmode="numeric" maxlength="12" placeholder="输入 PIN">
+    <button class="big-btn" id="lgGo">进 入</button>
+    <button class="ghost-btn" id="lgBack">返回重选</button>
+  </div>
+</div>
 <div id="celebrate"></div>
 <div class="toast" id="toast"></div>
 
@@ -632,7 +667,11 @@ function seed() {
     },
     pending: [],
     config: {
-      password: '720720',
+      accounts: {
+        dad: { name: '爸爸', pin: '720720' },
+        mom: { name: '妈妈', pin: '123456' },
+        son: { name: '陈明哲', pin: '123456' }
+      },
       tasks: defaultTasks(),
       tiers: defaultTiers(),
       king: defaultKing(),
@@ -653,12 +692,24 @@ function load() {
     if (raw) {
       S = JSON.parse(raw);
       if (S && S.version !== 3) migrateV3();
+      migrateAccounts();
       compensateBoxes();
       return;
     }
   } catch (e) { }
   S = seed(); save();
   compensateBoxes();
+}
+/* 登录系统迁移：无 accounts 的旧 v3 状态 → 建三账号，爸爸 PIN 沿用旧口令 */
+function migrateAccounts() {
+  if (!S || !S.config || S.config.accounts) return;
+  S.config.accounts = {
+    dad: { name: '爸爸', pin: S.config.password || '720720' },
+    mom: { name: '妈妈', pin: '123456' },
+    son: { name: S.child.name || '陈明哲', pin: '123456' }
+  };
+  delete S.config.password;
+  save();
 }
 /* 一次性补发：旧账本积累的积分没领过升级盲盒，按 V3 门槛表把当前积分重走一遍补齐 */
 function compensateBoxes() {
@@ -745,6 +796,21 @@ var toastTimer = null;
 function toast(msg) {
   var t = $('toast'); t.textContent = msg; t.classList.add('on');
   clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('on'); }, 2400);
+}
+
+/* ================= 角色权限 ================= */
+function currentRole() { return sessionStorage.getItem('hero_role') || null; }
+function canAudit() { return currentRole() === 'dad' || currentRole() === 'mom'; }
+function canAdmin() { return currentRole() === 'dad'; }
+function canCheckin() { return currentRole() === 'son' || currentRole() === 'dad'; }
+function canOpenBox() { return currentRole() === 'son'; }
+function canUseItem() { return currentRole() === 'son' || currentRole() === 'dad'; }
+function roleLabel() {
+  var r = currentRole();
+  if (r === 'dad') return '👨 ' + S.config.accounts.dad.name;
+  if (r === 'mom') return '👩 ' + S.config.accounts.mom.name;
+  if (r === 'son') return '🦸 ' + S.child.name;
+  return '';
 }
 
 /* ================= 段位逻辑 ================= */
@@ -898,6 +964,7 @@ function taskDoneToday(task) {
   return checkinCountToday(task.id) + pendingCount(task.id) >= 1;
 }
 function doCheckin(task) {
+  if (!canCheckin()) { toast('打卡只有明哲本人（或爸爸代打）可以哦'); return; }
   if (taskFullToday(task)) return;
   S.pending.push({ id: 'p' + Date.now() + Math.floor(Math.random()*100), kind:'checkin', task: task.id, ts: nowTime() });
   save(); renderAll();
@@ -908,6 +975,7 @@ function findTask(id) {
   return null;
 }
 function confirmPending(pid) {
+  if (!canAudit()) { toast('只有爸爸妈妈可以确认'); return; }
   var i = S.pending.findIndex(function (p) { return p.id === pid; });
   if (i < 0) return;
   var p = S.pending[i];
@@ -935,6 +1003,7 @@ function confirmPending(pid) {
   toast('+' + got + ' 分到账 💰');
 }
 function rejectPending(pid) {
+  if (!canAudit()) { toast('只有爸爸妈妈可以驳回'); return; }
   var i = S.pending.findIndex(function (p) { return p.id === pid; });
   if (i < 0) return;
   S.pending.splice(i, 1); save(); renderAll();
@@ -949,6 +1018,7 @@ function weightedPick(pool) {
   return pool[pool.length - 1].item;
 }
 function openBox(bid) {
+  if (!canOpenBox()) { toast('盲盒只能由 ' + S.child.name + ' 本人开启 🔒'); return; }
   var i = S.child.blindboxes.findIndex(function (b) { return b.id === bid; });
   if (i < 0) return;
   var box = S.child.blindboxes[i];
@@ -999,6 +1069,7 @@ function showBoxResult(kind, result) {
 
 /* ================= 道具 ================= */
 function activateBuff(type) {
+  if (!canUseItem()) { toast('道具由明哲自己使用（爸爸可代操作）'); return; }
   if (!buffActive() && S.child.items[type] > 0) {
     S.child.items[type]--;
     var days = type === 'dbWeek' ? 7 : 1;
@@ -1009,6 +1080,7 @@ function activateBuff(type) {
   }
 }
 function useCoupon(item) {
+  if (!canUseItem()) { toast('道具由明哲自己使用（爸爸可代操作）'); return; }
   if ((S.child.items[item] || 0) <= 0) return;
   S.pending.push({ id: 'p' + Date.now() + Math.floor(Math.random()*100), kind: 'coupon', item: item, ts: nowTime() });
   save(); renderAll();
@@ -1049,6 +1121,7 @@ function heroHook() {
 
 /* ================= 兑换记账（家长） ================= */
 function openRedeemSheet() {
+  if (!canAudit()) { toast('兑换记账只有爸爸妈妈可以'); return; }
   openSheet('<div class="sheet-head"><div class="t">💰 积分兑换现金</div>' +
     '<button class="sheet-close" onclick="closeSheet()">✕</button></div>' +
     '<div class="f-row"><div class="f-label">当前成长积分：<b style="color:var(--gold)" id="rdAvail"></b> ｜ 兑换比例 <b id="rdRate"></b> 分 = 1 元</div></div>' +
@@ -1093,11 +1166,13 @@ function renderRedeemHist() {
 /* ================= 家长后台 ================= */
 var adminTab = 'tasks';
 function openAdminSheet() {
-  openSheet('<div class="sheet-head"><div class="t">⚙️ 家长后台</div>' +
+  if (!canAdmin()) { toast('家长后台只有爸爸可以进入'); return; }
+  openSheet('<div class="sheet-head"><div class="t">⚙️ 家长后台（爸爸）</div>' +
     '<button class="sheet-close" onclick="closeSheet()">✕</button></div>' +
     '<div class="sub-tabs">' +
     '<button data-at="tasks">任务积分</button><button data-at="tiers">段位门槛</button>' +
-    '<button data-at="ms">里程碑</button><button data-at="sys">系统配置</button></div>' +
+    '<button data-at="ms">里程碑</button><button data-at="sys">系统配置</button>' +
+    '<button data-at="acct">账号</button></div>' +
     '<div id="adminBody"></div>');
   document.querySelectorAll('.sub-tabs button').forEach(function (b) {
     b.addEventListener('click', function () { adminTab = b.dataset.at; renderAdmin(); });
@@ -1112,7 +1187,33 @@ function renderAdmin() {
   if (adminTab === 'tasks') renderAdminTasks(el);
   else if (adminTab === 'tiers') renderAdminTiers(el);
   else if (adminTab === 'ms') renderAdminMs(el);
+  else if (adminTab === 'acct') renderAdminAcct(el);
   else renderAdminSys(el);
+}
+function renderAdminAcct(el) {
+  var roles = [['dad', '👨'], ['mom', '👩'], ['son', '🦸']];
+  var html = roles.map(function (r) {
+    var a = S.config.accounts[r[0]];
+    var extra = r[0] === 'dad' ? '（最高权限）' : r[0] === 'mom' ? '（审核权限）' : '（查看+打卡+专属开盒）';
+    return '<div class="cfg-row"><div class="cfg-name">' + r[1] + ' <input class="f-input" style="min-height:38px;width:110px;display:inline-block" data-an="' + r[0] + '" value="' + esc(a.name) + '">' +
+      '<span class="s">' + extra + '</span></div>' +
+      '<input class="cfg-num" type="text" data-ap="' + r[0] + '" value="' + esc(a.pin) + '" style="width:110px"></div>';
+  }).join('');
+  html += '<button class="big-btn" id="saveAcct">保存账号设置</button>' +
+    '<div class="small-note">PIN 即登录密码；建议妈妈和明哲的默认 PIN 首次就改掉</div>';
+  el.innerHTML = html;
+  $('saveAcct').addEventListener('click', function () {
+    el.querySelectorAll('[data-an]').forEach(function (n) {
+      var v = n.value.trim() || n.value;
+      S.config.accounts[n.dataset.an].name = v;
+      if (n.dataset.an === 'son') S.child.name = v;
+    });
+    el.querySelectorAll('[data-ap]').forEach(function (n) {
+      var v = n.value.trim();
+      if (v.length >= 4) S.config.accounts[n.dataset.ap].pin = v;
+    });
+    save(); renderAll(); toast('账号设置已保存 ✅');
+  });
 }
 function renderAdminTasks(el) {
   var html = '';
@@ -1253,11 +1354,7 @@ function renderAdminSys(el) {
     '<div class="cfg-row"><div class="cfg-name">生日日期<span class="s">月-日</span></div><input class="cfg-num" type="text" data-sk="birthdayDate" value="' + sys.birthdayDate + '"></div>' +
     '<div class="cfg-row"><div class="cfg-name">盲盒保底<span class="s">累计几盒必出道具</span></div><input class="cfg-num" type="number" data-sk="pity" value="' + sys.pity + '"></div>' +
     '<button class="big-btn" id="saveSys">保存系统配置</button>' +
-    '<div style="margin-top:18px" class="grp-title">🔑 修改家长口令</div>' +
-    '<div class="f-row"><div class="f-label">旧口令</div><input class="f-input" id="pwOld" type="password"></div>' +
-    '<div class="f-2col"><div class="f-row"><div class="f-label">新口令</div><input class="f-input" id="pwNew" type="password"></div>' +
-    '<div class="f-row"><div class="f-label">再输一遍</div><input class="f-input" id="pwNew2" type="password"></div></div>' +
-    '<button class="ghost-btn" id="pwSave">修改口令</button>';
+    '<div class="small-note" style="margin-top:14px">🔑 登录账号与各人 PIN 请到「账号」页管理</div>';
   $('saveSys').addEventListener('click', function () {
     el.querySelectorAll('[data-sk]').forEach(function (n) {
       var k = n.dataset.sk;
@@ -1267,19 +1364,11 @@ function renderAdminSys(el) {
     S.config.system.birthdayDate = el.querySelector('[data-sk="birthdayDate"]').value.trim() || '07-20';
     save(); renderAll(); toast('系统配置已保存 ✅');
   });
-  $('pwSave').addEventListener('click', function () {
-    if ($('pwOld').value !== S.config.password) { toast('旧口令不对'); return; }
-    var nw = $('pwNew').value;
-    if (nw.length < 4) { toast('新口令至少 4 位'); return; }
-    if (nw !== $('pwNew2').value) { toast('两次输入不一致'); return; }
-    S.config.password = nw; save();
-    $('pwOld').value = ''; $('pwNew').value = ''; $('pwNew2').value = '';
-    toast('口令已修改 ✅');
-  });
 }
 
 /* ================= 数据管理（家长） ================= */
 function openDataSheet() {
+  if (!canAdmin()) { toast('数据管理只有爸爸可以'); return; }
   openSheet('<div class="sheet-head"><div class="t">🗄️ 数据管理</div>' +
     '<button class="sheet-close" onclick="closeSheet()">✕</button></div>' +
     '<div class="small-note" style="text-align:left">数据存在本机浏览器里。换设备 / 防丢失：导出备份，到新设备导入即可。</div>' +
@@ -1369,24 +1458,27 @@ function renderHeader() {
   $('hTier').textContent = S.child.points + ' 分 · 加成×' + info.bonus.toFixed(2);
   var wd = ['日','一','二','三','四','五','六']; var d = new Date();
   $('hDate').textContent = (d.getMonth()+1) + '月' + d.getDate() + '日 周' + wd[d.getDay()];
-  var isParent = sessionStorage.getItem('hero_parent') === '1';
-  $('parentBar').classList.toggle('on', isParent);
-  $('parentBtn').classList.toggle('on', isParent);
-  $('parentBtn').textContent = isParent ? '家长模式中' : '家长入口';
+  var role = currentRole();
+  $('roleBtn').textContent = role ? roleLabel() + ' · 退出' : '未登录';
+  /* 角色横幅：爸爸=全套；妈妈=审核类 */
+  $('parentBar').classList.toggle('on', role === 'dad' || role === 'mom');
+  $('pbAdmin').style.display = role === 'dad' ? '' : 'none';
+  $('pbData').style.display = role === 'dad' ? '' : 'none';
+  $('pbRedeem').style.display = canAudit() ? '' : 'none';
+  $('pbExit').style.display = role ? '' : 'none';
   $('pbBadge').textContent = S.pending.length;
   /* buff 条 */
   if (buffActive()) {
     $('buffStrip').classList.add('on');
     $('buffLeft').textContent = (S.child.activeBuff.type === 'dbWeek' ? '周卡' : '天卡') + ' · 还剩 ' + buffLeftDays() + ' 天';
   } else { $('buffStrip').classList.remove('on'); }
-  /* 备份提醒（仅家长模式） */
-  var need = isParent && (!S.lastExportAt || (Date.now() - new Date(S.lastExportAt).getTime()) > 7 * 86400000);
+  /* 备份提醒（仅爸爸） */
+  var need = canAdmin() && (!S.lastExportAt || (Date.now() - new Date(S.lastExportAt).getTime()) > 7 * 86400000);
   $('backupStrip').classList.toggle('on', !!need);
 }
 
 function renderHome() {
-  var isParent = sessionStorage.getItem('hero_parent') === '1';
-  $('pendCard').style.display = (isParent && S.pending.length) ? '' : 'none';
+  $('pendCard').style.display = (canAudit() && S.pending.length) ? '' : 'none';
   $('pendList').innerHTML = S.pending.map(function (p) {
     if (p.kind === 'coupon') {
       var m = ITEM_META[p.item];
@@ -1422,9 +1514,15 @@ function renderHome() {
     var any = used >= 1;
     var cntTag = max > 1 ? '<span class="cnt">' + used + '/' + max + '</span>' : '';
     var btn;
-    if (full) btn = '<div class="' + (any ? 'ck-done' : 'ck-wait') + '">' + (any ? '✓ 今日已满' : '⏳ 待确认') + '</div>';
-    else if (any) btn = '<button class="ck-btn" data-ck="' + t.id + '">再打卡</button>';
-    else btn = '<button class="ck-btn" data-ck="' + t.id + '">打卡</button>';
+    if (canCheckin()) {
+      if (full) btn = '<div class="' + (any ? 'ck-done' : 'ck-wait') + '">' + (any ? '✓ 今日已满' : '⏳ 待确认') + '</div>';
+      else if (any) btn = '<button class="ck-btn" data-ck="' + t.id + '">再打卡</button>';
+      else btn = '<button class="ck-btn" data-ck="' + t.id + '">打卡</button>';
+    } else {
+      /* 妈妈（只读）：看状态不能打卡 */
+      btn = '<div class="' + (any ? (full ? 'ck-done' : 'ck-wait') : 'ck-wait') + '" style="opacity:.55;border-style:solid">' +
+        (any ? (full ? '✓ 已到账' : '⏳ 待确认') : '未打卡') + '</div>';
+    }
     return '<div class="task-row"><div class="task-ico">' + t.icon + '</div>' +
       '<div class="task-info"><div class="n">' + esc(t.name) + cntTag + '</div>' +
       '<div class="p">基础 <b>' + t.points + '</b> 分 × ×' + earnMultiplier().toFixed(2) + ' = <b>' + Math.round(t.points * earnMultiplier()) + '</b> 分</div></div>' + btn + '</div>';
@@ -1547,7 +1645,9 @@ function renderBag() {
     hasItem = true;
     var m = ITEM_META[k];
     var btnHtml = '';
-    if (k === 'dbDay' || k === 'dbWeek') {
+    if (!canUseItem()) {
+      btnHtml = '<div class="ck-wait" style="opacity:.55;border-style:solid">明哲使用</div>';
+    } else if (k === 'dbDay' || k === 'dbWeek') {
       btnHtml = buffActive()
         ? '<div class="ck-wait" style="min-height:44px">生效中</div>'
         : '<button class="ck-btn" data-buff="' + k + '">激活</button>';
@@ -1572,10 +1672,12 @@ function renderBag() {
   $('pityNote').textContent = S.child.pityCount > 0 ? '距保底还差 ' + (pity - S.child.pityCount) + ' 盒' : '保底：累计 ' + pity + ' 盒必出道具';
   $('boxList').innerHTML = S.child.blindboxes.length ? S.child.blindboxes.map(function (b) {
     var km = BOX_KIND_META[b.kind];
+    var openHtml = canOpenBox()
+      ? '<button class="ck-btn" data-open="' + b.id + '">开盒</button>'
+      : '<div class="ck-wait">🔒 由' + esc(S.child.name) + '开</div>';
     return '<div class="box-row"><div class="box-ico">' + km.icon + '</div>' +
       '<div class="box-info"><div class="n">' + km.name + '</div>' +
-      '<div class="m">积分 ' + km.range[0] + '~' + km.range[1] + ' 或稀有道具</div></div>' +
-      '<button class="ck-btn" data-open="' + b.id + '">开盒</button></div>';
+      '<div class="m">积分 ' + km.range[0] + '~' + km.range[1] + ' 或稀有道具</div></div>' + openHtml + '</div>';
   }).join('') : '<div class="empty">还没有盲盒哦<br>升级就能获得盲盒：小段升=普通盒 · 跨大段=高级盒</div>';
   document.querySelectorAll('#boxList [data-open]').forEach(function (b) {
     b.addEventListener('click', function () { openBox(b.dataset.open); });
@@ -1622,11 +1724,19 @@ function renderMe() {
     var mi = tierIndexOfShort(m.tier);
     var reached = (m.tier === '王者') ? S.child.points >= S.config.king.entry : ci >= mi;
     var cls = m.granted ? 'done' : (reached ? 'reach' : '');
+    var grantBtn = (!m.granted && reached && canAudit())
+      ? '<div style="margin-top:8px"><button class="mini-btn go" data-msgrant="' + m.id + '">发放奖励</button></div>' : '';
     return '<div class="ms-card ' + cls + '"><div class="ms-top"><span class="ms-tier">' + esc(m.tier) + '</span>' +
       '<span class="ms-name">' + esc(m.name) + '</span>' +
       '<span class="ms-st">' + (m.granted ? '✅ 已发放' : (reached ? '🌟 已达成' : '🔒 升到' + esc(TIER_FULL[m.tier] || m.tier) + '解锁')) + '</span></div>' +
-      '<div class="ms-desc">' + esc(m.desc) + '</div></div>';
+      '<div class="ms-desc">' + esc(m.desc) + '</div>' + grantBtn + '</div>';
   }).join('') : '<div class="empty">还没有设置愿望，找爸妈加一个吧</div>';
+  document.querySelectorAll('#msList [data-msgrant]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var m = S.config.milestones.find(function (x) { return x.id === b.dataset.msgrant; });
+      if (m) { m.granted = true; m.grantedAt = todayStr(); save(); renderAll(); toast('已发放：' + m.name + ' 🎉'); }
+    });
+  });
 
   checkAchievements();
   var doneN = S.child.achievementsDone.length;
@@ -1654,23 +1764,51 @@ $('tabbar').addEventListener('click', function (e) {
   if (b) switchTab(b.dataset.tab);
 });
 
-/* ================= 家长模式 ================= */
-$('parentBtn').addEventListener('click', function () {
-  if (sessionStorage.getItem('hero_parent') === '1') {
-    sessionStorage.removeItem('hero_parent'); renderAll(); toast('已退出家长模式');
-    return;
-  }
-  openSheet('<div class="sheet-head"><div class="t">🔒 家长验证</div>' +
-    '<button class="sheet-close" onclick="closeSheet()">✕</button></div>' +
-    '<div class="f-row"><div class="f-label">请输入家长口令</div>' +
-    '<input class="f-input" id="pwIn" type="password" inputmode="numeric" placeholder="家长口令"></div>' +
-    '<button class="big-btn" id="pwGo">进入家长模式</button>');
-  $('pwGo').addEventListener('click', function () {
-    if ($('pwIn').value === S.config.password) {
-      sessionStorage.setItem('hero_parent', '1'); closeSheet(); renderAll();
-      toast('已进入家长模式 🛡️');
-    } else { toast('口令不对'); }
+/* ================= 登录/角色 ================= */
+var loginRole = null;
+function showLogin() {
+  var users = [['dad', '👨'], ['mom', '👩'], ['son', '🦸']];
+  $('lgUsers').innerHTML = users.map(function (u) {
+    var nm = u[0] === 'son' ? S.child.name : S.config.accounts[u[0]].name;
+    return '<button class="lg-user" data-role="' + u[0] + '"><span class="e">' + u[1] + '</span><span class="n">' + esc(nm) + '</span></button>';
+  }).join('');
+  $('lgUsers').querySelectorAll('.lg-user').forEach(function (b) {
+    b.addEventListener('click', function () {
+      loginRole = b.dataset.role;
+      $('lgWho').textContent = (loginRole === 'son' ? S.child.name : S.config.accounts[loginRole].name) + ' · 请输入 PIN';
+      $('lgPinBox').style.display = '';
+      $('lgPin').value = '';
+      try { $('lgPin').focus(); } catch (e) { }
+    });
   });
+  $('lgPinBox').style.display = 'none';
+  $('loginView').classList.add('on');
+}
+function tryLogin() {
+  if (!loginRole) return;
+  if ($('lgPin').value === S.config.accounts[loginRole].pin) {
+    sessionStorage.setItem('hero_role', loginRole);
+    var who = loginRole === 'son' ? S.child.name : S.config.accounts[loginRole].name;
+    loginRole = null;
+    $('loginView').classList.remove('on');
+    renderAll();
+    checkBirthday();
+    checkAchievements();
+    toast('欢迎，' + who + '！');
+  } else {
+    toast('PIN 不对，再试试');
+    $('lgPin').value = '';
+  }
+}
+$('lgGo').addEventListener('click', tryLogin);
+$('lgPin').addEventListener('keydown', function (e) { if (e.key === 'Enter') tryLogin(); });
+$('lgBack').addEventListener('click', function () { $('lgPinBox').style.display = 'none'; loginRole = null; });
+$('roleBtn').addEventListener('click', function () {
+  if (!currentRole()) { showLogin(); return; }
+  sessionStorage.removeItem('hero_role');
+  renderHeader();
+  showLogin();
+  toast('已退出');
 });
 $('pbConfirm').addEventListener('click', function () { switchTab('home'); window.scrollTo(0, 0); });
 $('pbRedeem').addEventListener('click', openRedeemSheet);
@@ -1678,14 +1816,22 @@ $('pbAdmin').addEventListener('click', openAdminSheet);
 $('pbData').addEventListener('click', openDataSheet);
 $('backupStrip').addEventListener('click', openDataSheet);
 $('pbExit').addEventListener('click', function () {
-  sessionStorage.removeItem('hero_parent'); renderAll(); toast('已退出家长模式');
+  sessionStorage.removeItem('hero_role');
+  showLogin();
+  toast('已退出');
 });
 
 /* ================= 启动 ================= */
 load();
-renderAll();
-checkBirthday();
-checkAchievements();
+sessionStorage.removeItem('hero_parent'); /* 旧版家长标记废弃 */
+if (currentRole()) {
+  renderAll();
+  checkBirthday();
+  checkAchievements();
+} else {
+  renderHeader();
+  showLogin();
+}
 var resizeTimer = null;
 window.addEventListener('resize', function () {
   clearTimeout(resizeTimer);
@@ -1698,7 +1844,9 @@ window.__hero = {
   addPoints: addPoints, confirmPending: confirmPending, openBox: openBox,
   doCheckin: doCheckin, activateBuff: activateBuff, useCoupon: useCoupon,
   levelInfo: levelInfo, streakDays: streakDays, checkAchievements: checkAchievements,
-  grantBox: grantBox, weightedPick: weightedPick
+  grantBox: grantBox, weightedPick: weightedPick,
+  login: function (role) { sessionStorage.setItem('hero_role', role); document.getElementById('loginView').classList.remove('on'); renderAll(); },
+  logout: function () { sessionStorage.removeItem('hero_role'); renderHeader(); showLogin(); }
 };
 </script>
 </body>
