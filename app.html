@@ -68,6 +68,8 @@ main { flex:1; padding:14px 14px 20px; }
 .task-row { display:flex; align-items:center; gap:12px; padding:13px 14px; margin-bottom:10px; border-radius:12px;
   background:var(--panel2); border:1px solid rgba(205,127,50,.18); }
 .task-row.off { opacity:.4; }
+.grp-title { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:900; color:var(--gold-soft); margin:8px 2px 8px; }
+.grp-tag { font-size:10px; font-weight:700; color:#2a1503; background:linear-gradient(145deg,#FFD700,#CD7F32); padding:2px 8px; border-radius:999px; }
 .task-ico { font-size:26px; width:34px; text-align:center; flex:none; }
 .task-info { flex:1; min-width:0; }
 .task-info .n { font-size:15px; font-weight:700; }
@@ -390,14 +392,27 @@ function defaultTiers() {
   return arr;
 }
 
+var TASK_GROUPS = [
+  { key:'basic', label:'基础任务', tag:'全勤四项' },
+  { key:'study', label:'学习类' },
+  { key:'sport', label:'运动类' },
+  { key:'chore', label:'家务类' }
+];
 function defaultTasks() {
   return [
-    { id:'t1', name:'准时起床', icon:'🌅', points:5,  enabled:true },
-    { id:'t2', name:'刷牙洗脸', icon:'🪥', points:5,  enabled:true },
-    { id:'t3', name:'准时睡觉', icon:'🌙', points:5,  enabled:true },
-    { id:'t4', name:'锻炼身体', icon:'🏃', points:10, enabled:true },
-    { id:'t5', name:'准时写作业', icon:'📚', points:20, enabled:true },
-    { id:'t6', name:'做试卷', icon:'📝', points:30, enabled:true }
+    { id:'t1',  name:'准时起床', icon:'🌅', points:5, group:'basic', enabled:true },
+    { id:'t2',  name:'刷牙', icon:'🪥', points:5, group:'basic', enabled:true },
+    { id:'t3',  name:'整理房间', icon:'🏠', points:5, group:'basic', enabled:true },
+    { id:'t4',  name:'准时完成作业', icon:'✍️', points:10, group:'basic', enabled:true },
+    { id:'t5',  name:'做一份练习试卷', icon:'📝', points:10, group:'study', enabled:true },
+    { id:'t6',  name:'练习试卷全对', icon:'💯', points:10, group:'study', enabled:true },
+    { id:'t7',  name:'学科小测试考100', icon:'🎯', points:20, group:'study', enabled:true },
+    { id:'t8',  name:'期中/期末考100', icon:'🥇', points:50, group:'study', enabled:true },
+    { id:'t9',  name:'完成力量训练', icon:'💪', points:20, group:'sport', enabled:true },
+    { id:'t10', name:'跑步3公里', icon:'🏃', points:20, group:'sport', enabled:true },
+    { id:'t11', name:'跑步5公里', icon:'🏅', points:50, group:'sport', enabled:true },
+    { id:'t12', name:'洗碗', icon:'🍽️', points:10, group:'chore', enabled:true },
+    { id:'t13', name:'扫地', icon:'🧹', points:5, group:'chore', enabled:true }
   ];
 }
 
@@ -454,7 +469,18 @@ var S = null;
 function load() {
   try {
     var raw = localStorage.getItem(STORE_KEY);
-    if (raw) { S = JSON.parse(raw); return; }
+    if (raw) {
+      S = JSON.parse(raw);
+      /* v2 规则迁移：旧版 6 任务（无 group 字段）→ 换新 13 任务四类规则；
+         当日打卡/待确认清零重计，积分/流水/段位/盲盒全部保留 */
+      if (S && S.config && S.config.tasks && S.config.tasks.length && !S.config.tasks[0].group) {
+        S.config.tasks = defaultTasks();
+        delete S.child.checkins[todayStr()];
+        S.pending = [];
+        save();
+      }
+      return;
+    }
   } catch (e) { }
   S = seed(); save();
 }
@@ -517,10 +543,10 @@ function addPoints(delta, type, desc) {
   save();
 }
 
-/* 全勤：当天所有启用任务都有确认记录 */
+/* 全勤：当天全部启用的基础四项都有确认记录 */
 function isFullDay(dateStr) {
   var done = S.child.checkins[dateStr] || [];
-  var en = S.config.tasks.filter(function (t) { return t.enabled; });
+  var en = S.config.tasks.filter(function (t) { return t.enabled && t.group === 'basic'; });
   return en.length > 0 && en.every(function (t) { return done.indexOf(t.id) >= 0; });
 }
 function streakDays() {
@@ -690,13 +716,20 @@ function renderAdmin() {
   else renderAdminSys(el);
 }
 function renderAdminTasks(el) {
-  el.innerHTML = S.config.tasks.map(function (t, i) {
-    return '<div class="cfg-row"><div class="cfg-name">' + t.icon + ' ' + esc(t.name) +
-      '<span class="s">基础积分</span></div>' +
-      '<input class="cfg-num" type="number" data-ti="' + i + '" value="' + t.points + '">' +
-      '<div class="cfg-tog ' + (t.enabled ? 'on' : '') + '" data-tg="' + i + '"></div></div>';
-  }).join('') + '<button class="big-btn" id="saveTasks">保存任务设置</button>' +
-  '<div class="small-note">开关=任务是否启用（禁用后孩子端不显示）</div>';
+  var html = '';
+  TASK_GROUPS.forEach(function (g) {
+    html += '<div class="grp-title">' + g.label + (g.tag ? '<span class="grp-tag">' + g.tag + '</span>' : '') + '</div>';
+    S.config.tasks.forEach(function (t, i) {
+      if (t.group !== g.key) return;
+      html += '<div class="cfg-row"><div class="cfg-name">' + t.icon + ' ' + esc(t.name) +
+        '<span class="s">基础积分</span></div>' +
+        '<input class="cfg-num" type="number" data-ti="' + i + '" value="' + t.points + '">' +
+        '<div class="cfg-tog ' + (t.enabled ? 'on' : '') + '" data-tg="' + i + '"></div></div>';
+    });
+  });
+  html += '<button class="big-btn" id="saveTasks">保存任务设置</button>' +
+    '<div class="small-note">开关=任务是否启用（禁用后孩子端不显示）；全勤=基础四项当天全部确认</div>';
+  el.innerHTML = html;
   el.querySelectorAll('.cfg-tog').forEach(function (tg) {
     tg.addEventListener('click', function () {
       var i = +tg.dataset.tg; S.config.tasks[i].enabled = !S.config.tasks[i].enabled; save(); renderAdmin(); renderAll();
@@ -900,9 +933,11 @@ function renderHome() {
   });
 
   var done = S.child.checkins[todayStr()] || [];
-  var en = S.config.tasks.filter(function (t) { return t.enabled; });
-  $('homeProgress').textContent = '今日 ' + en.filter(function (t) { return done.indexOf(t.id) >= 0; }).length + '/' + en.length;
-  $('taskList').innerHTML = S.config.tasks.map(function (t) {
+  var enAll = S.config.tasks.filter(function (t) { return t.enabled; });
+  var enBasic = enAll.filter(function (t) { return t.group === 'basic'; });
+  var doneCnt = function (arr) { return arr.filter(function (t) { return done.indexOf(t.id) >= 0; }).length; };
+  $('homeProgress').textContent = '全勤 ' + doneCnt(enBasic) + '/' + enBasic.length + ' · 任务 ' + doneCnt(enAll) + '/' + enAll.length;
+  function rowHtml(t) {
     if (!t.enabled) return '';
     var st = taskDoneToday(t.id);
     var doneOk = done.indexOf(t.id) >= 0;
@@ -913,7 +948,17 @@ function renderHome() {
     return '<div class="task-row"><div class="task-ico">' + t.icon + '</div>' +
       '<div class="task-info"><div class="n">' + esc(t.name) + '</div>' +
       '<div class="p">基础 <b>' + t.points + '</b> 分 × 加成×' + bonusOf().toFixed(2) + ' = <b>' + Math.round(t.points * earnMultiplier()) + '</b> 分</div></div>' + btn + '</div>';
-  }).join('');
+  }
+  var listHtml = '';
+  TASK_GROUPS.forEach(function (g) {
+    var items = S.config.tasks.filter(function (t) { return t.group === g.key && t.enabled; });
+    if (!items.length) return;
+    listHtml += '<div class="grp-title">' + g.label +
+      (g.tag ? '<span class="grp-tag">' + g.tag + '</span>' : '') + '</div>' + items.map(rowHtml).join('');
+  });
+  var orphan = S.config.tasks.filter(function (t) { return !t.group && t.enabled; });
+  if (orphan.length) listHtml += orphan.map(rowHtml).join('');
+  $('taskList').innerHTML = listHtml;
   $('bwHint').style.display = inBirthdayWeek() ? '' : 'none';
   document.querySelectorAll('#taskList [data-ck]').forEach(function (b) {
     b.addEventListener('click', function () { doCheckin(findTask(b.dataset.ck)); });
